@@ -4,7 +4,18 @@ import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
 import { User } from '@core/entities/user.entity';
 import { Email } from '@core/value-objects/email.vo';
 import { FirstName, LastName } from '@core/value-objects/name.vo';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 // We're using a mock record instead of the actual Prisma types
+
+// Mock Logger
+const mockLoggerService = {
+  setContext: jest.fn().mockReturnThis(),
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+  verbose: jest.fn(),
+};
 
 // Mock PrismaService
 const mockPrismaService = {
@@ -27,7 +38,11 @@ describe('UserRepository', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserRepository, { provide: PrismaService, useValue: mockPrismaService }],
+      providers: [
+        UserRepository,
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: LoggerService, useValue: mockLoggerService },
+      ],
     }).compile();
 
     repository = module.get<UserRepository>(UserRepository);

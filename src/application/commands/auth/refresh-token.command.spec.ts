@@ -6,6 +6,7 @@ import { RefreshTokenCommand, RefreshTokenCommandHandler } from './refresh-token
 import { AuthService } from '@core/services/auth.service';
 import { IUserRepository } from '@core/repositories/user.repository.interface';
 import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 import { RefreshToken } from '@core/entities/refresh-token.entity';
 import { User } from '@core/entities/user.entity';
 import { Email } from '@core/value-objects/email.vo';
@@ -50,6 +51,16 @@ const mockConfigService = {
 
     return config[key];
   }),
+};
+
+// Mock Logger
+const mockLoggerService = {
+  setContext: jest.fn().mockReturnThis(),
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+  verbose: jest.fn(),
 };
 
 // Create test data
@@ -115,6 +126,7 @@ describe('RefreshTokenCommandHandler', () => {
         { provide: AuthService, useValue: mockAuthService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: LoggerService, useValue: mockLoggerService },
       ],
     }).compile();
 

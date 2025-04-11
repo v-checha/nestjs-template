@@ -5,10 +5,14 @@ import { ConfigService } from '@nestjs/config';
 import { AllExceptionsFilter } from '@presentation/filters/all-exceptions.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as basicAuth from 'express-basic-auth';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const logger = await app.resolve(LoggerService);
+
+  logger.setContext('Application');
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -20,7 +24,8 @@ async function bootstrap() {
   );
 
   // Global exception filter
-  app.useGlobalFilters(new AllExceptionsFilter());
+  const exceptionLogger = await app.resolve(LoggerService);
+  app.useGlobalFilters(new AllExceptionsFilter(exceptionLogger));
 
   // Enable CORS
   app.enableCors();
@@ -83,11 +88,25 @@ async function bootstrap() {
 
   // Start server
   const port = configService.get<number>('PORT', 3000);
+  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
+
   await app.listen(port);
-  // eslint-disable-next-line no-console
-  console.log(`Application is running on: ${await app.getUrl()}`);
-  // eslint-disable-next-line no-console
-  console.log(`Swagger documentation is available at: ${await app.getUrl()}/docs`);
+  const appUrl = await app.getUrl();
+
+  logger.log({
+    message: 'Application started',
+    port,
+    environment: nodeEnv,
+    url: appUrl,
+  });
+
+  logger.log({
+    message: 'Swagger documentation available',
+    url: `${appUrl}/docs`,
+  });
 }
 
-bootstrap();
+bootstrap().catch(err => {
+  console.error('Error starting application:', err);
+  process.exit(1);
+});

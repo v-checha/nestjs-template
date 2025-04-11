@@ -8,6 +8,7 @@ import { IRoleRepository } from '@core/repositories/role.repository.interface';
 import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
 import { UserMapper } from '@application/mappers/user.mapper';
 import { I18nService } from 'nestjs-i18n';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 export class LoginCommand implements ICommand {
   constructor(public readonly loginDto: LoginDto) {}
@@ -23,16 +24,24 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     private readonly i18n: I18nService,
     @Inject('RoleRepository')
     private readonly roleRepository: IRoleRepository,
-  ) {}
+    @Inject(LoggerService) private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext(LoginCommandHandler.name);
+  }
 
   async execute(command: LoginCommand): Promise<AuthResponse> {
-    const { email, password } = command.loginDto;
+    const { email } = command.loginDto;
+
+    this.logger.log({ message: 'Login attempt', email });
 
     // Validate credentials
-    const user = await this.userService.validateCredentials(email, password);
+    const user = await this.userService.validateCredentials(email, command.loginDto.password);
     if (!user) {
+      this.logger.warn({ message: 'Login failed - invalid credentials', email });
       throw new UnauthorizedException(this.i18n.t('common.auth.login.failed'));
     }
+
+    this.logger.debug({ message: 'Credentials validated successfully', userId: user.id, email });
 
     // Update last login
     await this.authService.updateLastLogin(user.id);
@@ -42,6 +51,12 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
     // If email verification is required and not verified, prompt user to verify first
     if (!isEmailVerified) {
+      this.logger.debug({
+        message: 'Login requires email verification',
+        userId: user.id,
+        email,
+      });
+
       return {
         requiresEmailVerification: true,
         userId: user.id,
@@ -52,6 +67,12 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
     // Check if OTP is enabled
     if (user.otpEnabled) {
+      this.logger.debug({
+        message: 'Login requires 2FA verification',
+        userId: user.id,
+        email,
+      });
+
       return {
         requiresOtp: true,
         userId: user.id,
@@ -70,12 +91,25 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
       }
     }
 
+    this.logger.debug({
+      message: 'User permissions collected',
+      userId: user.id,
+      roles: user.roles.map(r => r.name),
+      permissionsCount: userPermissions.size,
+    });
+
     // Generate JWT tokens
     const { accessToken, refreshToken } = await this.tokenProvider.generateTokens(
       user,
       Array.from(userPermissions),
       true, // Email is verified at this point
     );
+
+    this.logger.log({
+      message: 'Login successful',
+      userId: user.id,
+      email,
+    });
 
     return {
       accessToken,

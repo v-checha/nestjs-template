@@ -1,10 +1,13 @@
-import { ExceptionFilter, Catch, ArgumentsHost, Logger } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, Inject } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { DomainException } from '@core/exceptions/domain-exceptions';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 @Catch(DomainException)
 export class DomainExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(DomainExceptionsFilter.name);
+  constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
+    this.logger.setContext(DomainExceptionsFilter.name);
+  }
 
   catch(exception: DomainException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -12,9 +15,17 @@ export class DomainExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
-    // Log the exception
+    // Log the domain exception with structured data
     this.logger.error(
-      `${request.method} ${request.url} - ${status} - ${exception.message}`,
+      {
+        message: 'Domain exception',
+        method: request.method,
+        url: request.url,
+        status,
+        exceptionName: exception.name,
+        exceptionMessage: exception.message,
+        userId: (request.user && request.user['sub']) || 'anonymous',
+      },
       exception.stack,
     );
 

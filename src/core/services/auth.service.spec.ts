@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 // Mocks
 import {
@@ -48,6 +49,16 @@ describe('AuthService', () => {
   let passwordResetRepository;
   let configService;
 
+  // Mock logger
+  const mockLoggerService = {
+    setContext: jest.fn().mockReturnThis(),
+    log: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+    verbose: jest.fn(),
+  };
+
   beforeEach(async () => {
     // Create fresh mocks for each test
     userRepository = createMockUserRepository();
@@ -66,6 +77,7 @@ describe('AuthService', () => {
         { provide: 'EmailVerificationRepository', useValue: emailVerificationRepository },
         { provide: 'PasswordResetRepository', useValue: passwordResetRepository },
         { provide: ConfigService, useValue: configService },
+        { provide: LoggerService, useValue: mockLoggerService },
       ],
     }).compile();
 

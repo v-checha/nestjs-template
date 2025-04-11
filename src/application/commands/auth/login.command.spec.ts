@@ -13,6 +13,7 @@ import { Role } from '@core/entities/role.entity';
 import { Permission } from '@core/entities/permission.entity';
 import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
 import { I18nService } from 'nestjs-i18n';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 // Mock dependencies
 const mockUserService = {
@@ -43,6 +44,16 @@ const mockI18nService = {
 
     return translations[key] || key;
   }),
+};
+
+// Mock Logger
+const mockLoggerService = {
+  setContext: jest.fn().mockReturnThis(),
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+  verbose: jest.fn(),
 };
 
 // Create utility functions for test data
@@ -98,6 +109,7 @@ describe('LoginCommandHandler', () => {
         { provide: TokenProvider, useValue: mockTokenProvider },
         { provide: 'RoleRepository', useValue: mockRoleRepository },
         { provide: I18nService, useValue: mockI18nService },
+        { provide: LoggerService, useValue: mockLoggerService },
       ],
     }).compile();
 

@@ -1,4 +1,5 @@
-import { Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 /**
  * Base repository class with common error handling
@@ -6,7 +7,15 @@ import { Logger } from '@nestjs/common';
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export abstract class BaseRepository<T> {
-  protected readonly logger = new Logger(this.constructor.name);
+  @Inject(LoggerService) protected readonly logger: LoggerService;
+
+  constructor() {
+    // We need to initialize the logger in the child constructor since
+    // this.constructor.name isn't available in the base class constructor
+    setTimeout(() => {
+      this.logger.setContext(this.constructor.name);
+    }, 0);
+  }
 
   /**
    * Handle repository errors
@@ -21,9 +30,22 @@ export abstract class BaseRepository<T> {
     returnValue: R | null = null,
   ): R | null {
     if (error instanceof Error) {
-      this.logger.error(`Error in ${operation}: ${error.message}`, error.stack);
+      this.logger.error(
+        {
+          message: `Repository operation failed`,
+          operation,
+          errorMessage: error.message,
+          entityType: this.constructor.name.replace('Repository', ''),
+        },
+        error.stack,
+      );
     } else {
-      this.logger.error(`Error in ${operation}: ${String(error)}`);
+      this.logger.error({
+        message: `Repository operation failed`,
+        operation,
+        error: String(error),
+        entityType: this.constructor.name.replace('Repository', ''),
+      });
     }
 
     return returnValue;
@@ -41,9 +63,29 @@ export abstract class BaseRepository<T> {
     operation: string,
     action: () => Promise<R>,
     fallbackValue?: R,
+    entityId?: string,
   ): Promise<R | undefined> {
     try {
-      return await action();
+      this.logger.debug({
+        message: `Repository operation started`,
+        operation,
+        entityType: this.constructor.name.replace('Repository', ''),
+        entityId,
+      });
+
+      const startTime = Date.now();
+      const result = await action();
+      const duration = Date.now() - startTime;
+
+      this.logger.debug({
+        message: `Repository operation completed`,
+        operation,
+        entityType: this.constructor.name.replace('Repository', ''),
+        entityId,
+        duration: `${duration}ms`,
+      });
+
+      return result;
     } catch (error) {
       return this.handleError<R>(operation, error, fallbackValue);
     }

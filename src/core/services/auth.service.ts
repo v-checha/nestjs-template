@@ -22,6 +22,7 @@ import { Email } from '@core/value-objects/email.vo';
 import { UserId } from '@core/value-objects/user-id.vo';
 import { Token } from '@core/value-objects/token.vo';
 import { VerificationCode } from '@core/value-objects/verification-code.vo';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,10 @@ export class AuthService {
     @Inject('PasswordResetRepository')
     private readonly passwordResetRepository: IPasswordResetRepository,
     private readonly configService: ConfigService,
-  ) {}
+    @Inject(LoggerService) private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext(AuthService.name);
+  }
 
   private get otpConfig() {
     return {
@@ -85,17 +89,26 @@ export class AuthService {
   }
 
   async verifyOtp(userId: string, token: string): Promise<boolean> {
+    this.logger.debug({ message: 'Verifying OTP', userId });
+
     const user = await this.userRepository.findById(userId);
     if (!user) {
+      this.logger.warn({ message: 'User not found during OTP verification', userId });
       throw new EntityNotFoundException('User', userId);
     }
 
     const otp = await this.otpRepository.findByUserId(userId);
     if (!otp) {
+      this.logger.warn({ message: 'OTP not found for user', userId });
       throw new EntityNotFoundException('OTP');
     }
 
     if (otp.isExpired()) {
+      this.logger.warn({
+        message: 'OTP has expired',
+        userId,
+        expiresAt: otp.expiresAt,
+      });
       throw new OtpExpiredException();
     }
 
@@ -108,11 +121,13 @@ export class AuthService {
     });
 
     if (isValid) {
+      this.logger.log({ message: 'OTP verified successfully', userId });
       otp.markAsVerified();
       await this.otpRepository.update(otp);
 
       return true;
     } else {
+      this.logger.warn({ message: 'Invalid OTP provided', userId });
       throw new OtpInvalidException();
     }
   }
@@ -193,18 +208,36 @@ export class AuthService {
   }
 
   async validateRefreshToken(token: string): Promise<RefreshToken> {
+    this.logger.debug({ message: 'Validating refresh token' });
+
     const refreshToken = await this.refreshTokenRepository.findByToken(token);
     if (!refreshToken) {
+      this.logger.warn({ message: 'Invalid refresh token, token not found in database' });
       throw new AuthenticationException('Invalid refresh token');
     }
 
     if (refreshToken.isExpired()) {
+      this.logger.warn({
+        message: 'Refresh token has expired',
+        userId: refreshToken.userId.getValue(),
+        expiresAt: refreshToken.expiresAt,
+      });
       throw new AuthenticationException('Refresh token has expired');
     }
 
     if (refreshToken.isRevoked()) {
+      this.logger.warn({
+        message: 'Refresh token has been revoked',
+        userId: refreshToken.userId.getValue(),
+        revokedAt: refreshToken.revokedAt,
+      });
       throw new AuthenticationException('Refresh token has been revoked');
     }
+
+    this.logger.debug({
+      message: 'Refresh token validated successfully',
+      userId: refreshToken.userId.getValue(),
+    });
 
     return refreshToken;
   }
@@ -410,8 +443,16 @@ export class AuthService {
    * @throws OtpInvalidException if token is already used
    */
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    this.logger.log({ message: 'Password reset requested with token' });
+
     // Validate the token and get the user
     const user = await this.validatePasswordResetToken(token);
+
+    this.logger.debug({
+      message: 'Password reset token validated',
+      userId: user.id,
+      email: user.email,
+    });
 
     // Get the password reset record
     const passwordReset = await this.passwordResetRepository.findByToken(token);
@@ -426,6 +467,12 @@ export class AuthService {
 
     // Revoke all refresh tokens for this user
     await this.refreshTokenRepository.deleteByUserId(user.id);
+
+    this.logger.log({
+      message: 'Password reset completed successfully',
+      userId: user.id,
+      email: user.email,
+    });
 
     return true;
   }

@@ -4,9 +4,10 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger,
+  Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { LoggerService } from '@infrastructure/logger/logger.service';
 
 interface IHttpExceptionResponse {
   message: string | string[];
@@ -16,7 +17,9 @@ interface IHttpExceptionResponse {
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(AllExceptionsFilter.name);
+  constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
+    this.logger.setContext(AllExceptionsFilter.name);
+  }
 
   catch(exception: Error | HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -42,8 +45,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = exception.message;
     }
 
-    // Log the error
-    this.logger.error(`${request.method} ${request.url} - ${status} - ${message}`, exception.stack);
+    // Log the error with structured data
+    this.logger.error(
+      {
+        message: 'Request error',
+        method: request.method,
+        url: request.url,
+        status,
+        error,
+        errorMessage: message,
+        userId: (request.user && request.user['sub']) || 'anonymous',
+      },
+      exception.stack,
+    );
 
     response.status(status).json({
       statusCode: status,

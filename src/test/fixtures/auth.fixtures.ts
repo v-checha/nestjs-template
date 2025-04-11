@@ -74,7 +74,7 @@ export const authFixtures = {
     validToken: () => ({
       id: '1',
       token: '550e8400-e29b-41d4-a716-446655440000',
-      userId: '550e8400-e29b-41d4-a716-446655440000',
+      userId: { getValue: () => '550e8400-e29b-41d4-a716-446655440000' },
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       revokedAt: null,
       createdAt: new Date(),
@@ -85,7 +85,7 @@ export const authFixtures = {
     expiredToken: () => ({
       id: '2',
       token: '550e8400-e29b-41d4-a716-446655440001',
-      userId: '550e8400-e29b-41d4-a716-446655440000',
+      userId: { getValue: () => '550e8400-e29b-41d4-a716-446655440000' },
       expiresAt: new Date(Date.now() - 1000), // Expired
       revokedAt: null,
       createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
@@ -96,7 +96,7 @@ export const authFixtures = {
     revokedToken: () => ({
       id: '3',
       token: '550e8400-e29b-41d4-a716-446655440002',
-      userId: '550e8400-e29b-41d4-a716-446655440000',
+      userId: { getValue: () => '550e8400-e29b-41d4-a716-446655440000' },
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       revokedAt: new Date(), // Revoked
       createdAt: new Date(),
