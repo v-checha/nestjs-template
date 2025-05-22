@@ -73,7 +73,7 @@ describe('UserRepository', () => {
         include: expect.any(Object),
       });
       expect(result).toBeInstanceOf(User);
-      expect(result.id).toBe(userId);
+      expect(result.id.getValue()).toBe(userId);
       expect(result.email.getValue()).toBe('test@example.com');
       expect(result.firstName.getValue()).toBe('John');
       expect(result.lastName.getValue()).toBe('Doe');
@@ -120,14 +120,14 @@ describe('UserRepository', () => {
   describe('create', () => {
     it('should create a new user', async () => {
       // Arrange
-      const newUser = new User(
+      const newUser = User.create(
         new Email('test@example.com'),
         'hashedPassword',
         new FirstName('John'),
         new LastName('Doe'),
       );
 
-      const mockCreatedUser = createMockUserRecord(newUser.id, newUser.email.getValue());
+      const mockCreatedUser = createMockUserRecord(newUser.id.getValue(), newUser.email.getValue());
       mockPrismaService.user.create.mockResolvedValue(mockCreatedUser);
 
       // Act
@@ -136,7 +136,7 @@ describe('UserRepository', () => {
       // Assert
       expect(prismaService.user.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          id: newUser.id,
+          id: newUser.id.getValue(),
           email: newUser.email.getValue(),
           passwordHash: newUser.passwordHash,
           firstName: newUser.firstName.getValue(),
@@ -145,22 +145,24 @@ describe('UserRepository', () => {
         include: expect.any(Object),
       });
       expect(result).toBeInstanceOf(User);
-      expect(result.id).toBe(newUser.id);
+      expect(result.id.getValue()).toBe(newUser.id.getValue());
     });
   });
 
   describe('update', () => {
     it('should update an existing user', async () => {
       // Arrange
-      const existingUser = new User(
+      const existingUser = User.create(
         new Email('test@example.com'),
         'hashedPassword',
         new FirstName('John'),
         new LastName('Doe'),
-        '550e8400-e29b-41d4-a716-446655440000',
       );
 
-      const mockUpdatedUser = createMockUserRecord(existingUser.id, existingUser.email.getValue());
+      const mockUpdatedUser = createMockUserRecord(
+        existingUser.id.getValue(),
+        existingUser.email.getValue(),
+      );
       mockPrismaService.userRole.deleteMany.mockResolvedValue({ count: 0 });
       mockPrismaService.user.update.mockResolvedValue(mockUpdatedUser);
 
@@ -169,10 +171,10 @@ describe('UserRepository', () => {
 
       // Assert
       expect(prismaService.userRole.deleteMany).toHaveBeenCalledWith({
-        where: { userId: existingUser.id },
+        where: { userId: existingUser.id.getValue() },
       });
       expect(prismaService.user.update).toHaveBeenCalledWith({
-        where: { id: existingUser.id },
+        where: { id: existingUser.id.getValue() },
         data: expect.objectContaining({
           email: existingUser.email.getValue(),
           firstName: existingUser.firstName.getValue(),
@@ -181,7 +183,7 @@ describe('UserRepository', () => {
         include: expect.any(Object),
       });
       expect(result).toBeInstanceOf(User);
-      expect(result.id).toBe(existingUser.id);
+      expect(result.id.getValue()).toBe(existingUser.id.getValue());
     });
   });
 

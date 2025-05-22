@@ -3,9 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
-// Controllers
-import { HealthController } from '@presentation/controllers/health.controller';
-
 // Modules
 import { PrismaModule } from '@infrastructure/database/prisma/prisma.module';
 import { ThrottlerModule } from '@infrastructure/throttler/throttler.module';
@@ -16,6 +13,8 @@ import { UserModule } from '@presentation/modules/user/user.module';
 import { RoleModule } from '@presentation/modules/role/role.module';
 import { AdminModule } from '@presentation/modules/admin/admin.module';
 import { StorageModule } from '@presentation/modules/storage/storage.module';
+import { HealthModule } from '@presentation/modules/health/health.module';
+import { CoreModule } from '@core/core.module';
 
 // Global providers
 import { LoggingInterceptor } from '@presentation/interceptors/logging.interceptor';
@@ -51,14 +50,18 @@ import configuration from '@infrastructure/config/configuration';
     // CQRS
     CqrsModule,
 
+    // Core Domain
+    CoreModule,
+
     // Feature Modules
     AuthModule,
     UserModule,
     RoleModule,
     AdminModule,
     StorageModule,
+    HealthModule,
   ],
-  controllers: [HealthController],
+  controllers: [],
   providers: [
     // Global interceptors
     {

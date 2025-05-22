@@ -66,17 +66,23 @@ const mockLoggerService = {
 
 // Create test data
 const createTestUser = (): User => {
-  const user = new User(
+  const user = User.create(
     new Email('test@example.com'),
     'hashedPassword',
     new FirstName('John'),
     new LastName('Doe'),
-    '550e8400-e29b-41d4-a716-446655440000',
   );
 
-  // Add role
-  const role = new Role('user', 'Regular user role', true);
-  role.id = '550e8400-e29b-41d4-a716-446655440001';
+  // Add role - need to use fromData method to set ID
+  const role = Role.fromData({
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'user',
+    description: 'Regular user role',
+    isDefault: true,
+    permissions: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   user.addRole(role);
 
   return user;
@@ -84,24 +90,31 @@ const createTestUser = (): User => {
 
 const createValidRefreshToken = (): RefreshToken => {
   return new RefreshToken(
-    new UserId('550e8400-e29b-41d4-a716-446655440000'),
+    UserId.fromString('550e8400-e29b-41d4-a716-446655440000'),
     new Token('550e8400-e29b-41d4-a716-446655440005'), // Use UUID format for token
     7, // 7 days expiration
   );
 };
 
 const createRoleWithPermissions = (): Role => {
-  const role = new Role('user', 'Regular user role', true);
-  role.id = '550e8400-e29b-41d4-a716-446655440001';
-
-  // Add permission
   const resourceAction = new ResourceAction('user', ActionType.READ);
-  const permission = new Permission(
+  const permission = Permission.fromData({
+    id: '550e8400-e29b-41d4-a716-446655440002',
     resourceAction,
-    'Can read user details',
-    '550e8400-e29b-41d4-a716-446655440002',
-  );
-  role.permissions = [permission];
+    description: 'Can read user details',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  const role = Role.fromData({
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'user',
+    description: 'Regular user role',
+    isDefault: true,
+    permissions: [permission],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 
   return role;
 };
@@ -179,7 +192,7 @@ describe('RefreshTokenCommandHandler', () => {
 
     expect(jwtService.sign).toHaveBeenCalledWith(
       expect.objectContaining({
-        sub: user.id,
+        sub: user.id.getValue(),
         email: user.email.getValue(),
         emailVerified: true,
         roles: ['user'],
@@ -192,7 +205,7 @@ describe('RefreshTokenCommandHandler', () => {
     );
 
     expect(authService.createRefreshToken).toHaveBeenCalledWith(
-      user.id,
+      user.id.getValue(),
       '550e8400-e29b-41d4-a716-446655440010',
     );
   });
@@ -242,9 +255,19 @@ describe('RefreshTokenCommandHandler', () => {
 
     const user = createTestUser();
 
-    // Add another role to the user
-    const adminRole = new Role('admin', 'Administrator role', false);
-    adminRole.id = '550e8400-e29b-41d4-a716-446655440003';
+    // Add another role to the user - mock the eligibility check
+    const adminRole = Role.fromData({
+      id: '550e8400-e29b-41d4-a716-446655440003',
+      name: 'admin',
+      description: 'Administrator role',
+      isDefault: false,
+      permissions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Mock the eligibility check to allow admin role assignment
+    jest.spyOn(user, 'isEligibleForAdminRole').mockReturnValue(true);
     user.addRole(adminRole);
 
     const refreshToken = createValidRefreshToken();
@@ -252,15 +275,24 @@ describe('RefreshTokenCommandHandler', () => {
     // Create roles with permissions for repository responses
     const userRoleWithPermissions = createRoleWithPermissions();
 
-    const adminRoleWithPermissions = new Role('admin', 'Administrator role', false);
-    adminRoleWithPermissions.id = '550e8400-e29b-41d4-a716-446655440003';
     const adminResourceAction = new ResourceAction('user', ActionType.WRITE);
-    const adminPermission = new Permission(
-      adminResourceAction,
-      'Can write user details',
-      '550e8400-e29b-41d4-a716-446655440004',
-    );
-    adminRoleWithPermissions.permissions = [adminPermission];
+    const adminPermission = Permission.fromData({
+      id: '550e8400-e29b-41d4-a716-446655440004',
+      resourceAction: adminResourceAction,
+      description: 'Can write user details',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const adminRoleWithPermissions = Role.fromData({
+      id: '550e8400-e29b-41d4-a716-446655440003',
+      name: 'admin',
+      description: 'Administrator role',
+      isDefault: false,
+      permissions: [adminPermission],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     mockAuthService.validateRefreshToken.mockResolvedValue(refreshToken);
     mockUserRepository.findById.mockResolvedValue(user);

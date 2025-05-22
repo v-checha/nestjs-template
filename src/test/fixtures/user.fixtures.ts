@@ -5,7 +5,7 @@
 export const userFixtures = {
   users: {
     validUser: () => ({
-      id: '550e8400-e29b-41d4-a716-446655440000',
+      id: { getValue: () => '550e8400-e29b-41d4-a716-446655440000' },
       email: {
         getValue: () => 'test@example.com',
       },
@@ -28,9 +28,13 @@ export const userFixtures = {
       addRole: jest.fn(),
       activate: jest.fn(),
       deactivate: jest.fn(),
+      updateProfile: jest.fn(),
+      changePassword: jest.fn(),
+      changeEmail: jest.fn(),
+      isEligibleForAdminRole: jest.fn().mockReturnValue(true),
     }),
     adminUser: () => ({
-      id: '550e8400-e29b-41d4-a716-446655440001',
+      id: { getValue: () => '550e8400-e29b-41d4-a716-446655440001' },
       email: {
         getValue: () => 'admin@example.com',
       },
@@ -53,9 +57,13 @@ export const userFixtures = {
       addRole: jest.fn(),
       activate: jest.fn(),
       deactivate: jest.fn(),
+      updateProfile: jest.fn(),
+      changePassword: jest.fn(),
+      changeEmail: jest.fn(),
+      isEligibleForAdminRole: jest.fn().mockReturnValue(true),
     }),
     inactiveUser: () => ({
-      id: '550e8400-e29b-41d4-a716-446655440002',
+      id: { getValue: () => '550e8400-e29b-41d4-a716-446655440002' },
       email: {
         getValue: () => 'inactive@example.com',
       },
@@ -78,6 +86,10 @@ export const userFixtures = {
       addRole: jest.fn(),
       activate: jest.fn(),
       deactivate: jest.fn(),
+      updateProfile: jest.fn(),
+      changePassword: jest.fn(),
+      changeEmail: jest.fn(),
+      isEligibleForAdminRole: jest.fn().mockReturnValue(true),
     }),
   },
 
@@ -94,6 +106,7 @@ export const userFixtures = {
         { id: '4', name: 'role:read' },
         { id: '5', name: 'role:write' },
       ],
+      isAdminRole: jest.fn().mockReturnValue(true),
     }),
     userRole: () => ({
       id: '2',
@@ -101,6 +114,7 @@ export const userFixtures = {
       description: 'Regular user role',
       isDefault: true,
       permissions: [{ id: '1', name: 'user:read' }],
+      isAdminRole: jest.fn().mockReturnValue(false),
     }),
   },
 

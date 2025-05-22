@@ -122,8 +122,6 @@ async function bootstrap() {
       tryItOutEnabled: true,
     },
     customSiteTitle: 'NestJS Clean Architecture API',
-    customfavIcon: '/favicon.ico',
-    customCssUrl: '/swagger-ui-custom.css',
   });
 
   // Start server

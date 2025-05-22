@@ -45,8 +45,8 @@ export class VerifyOtpCommandHandler implements ICommandHandler<VerifyOtpCommand
 
     // Generate JWT tokens
     const payload = {
-      sub: user.id,
-      email: user.email,
+      sub: user.id.getValue(),
+      email: user.email.getValue(),
       roles: user.roles.map(role => role.name),
     };
 
@@ -56,7 +56,7 @@ export class VerifyOtpCommandHandler implements ICommandHandler<VerifyOtpCommand
     });
 
     const refreshToken = uuidv4();
-    await this.authService.createRefreshToken(user.id, refreshToken);
+    await this.authService.createRefreshToken(user.id.getValue(), refreshToken);
 
     return {
       accessToken,

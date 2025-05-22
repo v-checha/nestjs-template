@@ -7,6 +7,7 @@ import {
   createMockUserRepository,
   createMockRoleRepository,
 } from '../../test/mocks/repositories.factory';
+import { DomainValidationService, ValidationResult } from './domain-validation.service';
 
 // Tokens
 import { USER_REPOSITORY, ROLE_REPOSITORY } from '@shared/constants/tokens';
@@ -29,21 +30,36 @@ jest.mock('bcrypt', () => ({
   compare: jest.fn().mockResolvedValue(true),
 }));
 
+// Mock DomainValidationService
+const createMockDomainValidationService = () => ({
+  validatePasswordComplexity: jest.fn().mockReturnValue({
+    isValid: true,
+    throwIfInvalid: jest.fn(),
+  }),
+  validateRoleAssignment: jest.fn().mockReturnValue({
+    isValid: true,
+    throwIfInvalid: jest.fn(),
+  }),
+});
+
 describe('UserService', () => {
   let service: UserService;
   let userRepository;
   let roleRepository;
+  let domainValidationService;
 
   beforeEach(async () => {
     // Create fresh mocks for each test
     userRepository = createMockUserRepository();
     roleRepository = createMockRoleRepository();
+    domainValidationService = createMockDomainValidationService();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
         { provide: USER_REPOSITORY, useValue: userRepository },
         { provide: ROLE_REPOSITORY, useValue: roleRepository },
+        { provide: DomainValidationService, useValue: domainValidationService },
       ],
     }).compile();
 
@@ -269,6 +285,15 @@ describe('UserService', () => {
       userRepository.findById.mockResolvedValue(user);
       userRepository.findByEmail.mockResolvedValue(null); // Email not in use
 
+      // Mock the repository update to return updated user
+      const updatedUser = {
+        ...user,
+        firstName: { getValue: () => newFirstName },
+        lastName: { getValue: () => newLastName },
+        email: { getValue: () => newEmail },
+      };
+      userRepository.update.mockResolvedValue(updatedUser);
+
       // Act
       const result = await service.updateUserDetails(userId, newFirstName, newLastName, newEmail);
 
@@ -301,7 +326,10 @@ describe('UserService', () => {
       const userId = '550e8400-e29b-41d4-a716-446655440000';
       const newEmail = 'existing@example.com';
       const user = userFixtures.users.validUser();
-      const existingUser = { ...userFixtures.users.validUser(), id: 'different-id' };
+      const existingUser = {
+        ...userFixtures.users.validUser(),
+        id: { getValue: () => 'different-id' },
+      };
 
       userRepository.findById.mockResolvedValue(user);
       userRepository.findByEmail.mockResolvedValue(existingUser);

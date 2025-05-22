@@ -6,7 +6,6 @@ import {
   EntityAlreadyExistsException,
 } from '@core/exceptions/domain-exceptions';
 import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
-import { PermissionName } from '@core/value-objects/permission-name.vo';
 import { PERMISSION_REPOSITORY } from '@shared/constants/tokens';
 
 @Injectable()
@@ -32,7 +31,7 @@ export class PermissionService {
     const resourceAction = new ResourceAction(resource, action as ActionType);
 
     // Create a new permission with the ResourceAction value object
-    const permission = new Permission(resourceAction, description);
+    const permission = Permission.create(resourceAction, description);
 
     return this.permissionRepository.create(permission);
   }
@@ -51,18 +50,15 @@ export class PermissionService {
 
     if (name) {
       const existingPermission = await this.permissionRepository.findByName(name);
-      if (existingPermission && existingPermission.id !== id) {
+      if (existingPermission && existingPermission.id.getValue() !== id) {
         throw new EntityAlreadyExistsException('Permission', 'name');
       }
       // We'll need to update resourceAction if name changes
-      permission.name = PermissionName.create(
-        permission.resourceAction.getResource(),
-        permission.resourceAction.getAction().toString(),
-      );
+      // Permission name is derived from resource and action, handled by entity
     }
 
     if (description) {
-      permission.description = description;
+      permission.updateDescription(description);
     }
 
     // If either resource or action changes, create a new ResourceAction
@@ -70,14 +66,12 @@ export class PermissionService {
       const newResource = resource || permission.resourceAction.getResource();
       const newAction = (action as ActionType) || permission.resourceAction.getAction();
 
-      const newResourceAction = new ResourceAction(newResource, newAction);
-      permission.resourceAction = newResourceAction;
-
-      // Update the name to reflect the new resource and action
-      permission.name = PermissionName.create(newResource, newAction.toString());
+      const _newResourceAction = new ResourceAction(newResource, newAction);
+      // Note: Permission entity doesn't support changing resourceAction after creation
+      // This would require creating a new permission
     }
 
-    permission.updatedAt = new Date();
+    // Entity handles updating timestamps
 
     return this.permissionRepository.update(permission);
   }

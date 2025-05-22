@@ -2,14 +2,15 @@ import { Controller, Get, HttpCode, HttpStatus, UseGuards } from '@nestjs/common
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 // Guards & Decorators
-import { RolesGuard } from '@presentation/guards/roles.guard';
-import { Roles } from '@shared/decorators/roles.decorator';
-import { RolesEnum } from '@shared/constants/roles.constants';
+import { PermissionsGuard } from '@presentation/guards/permissions.guard';
+import { RequiresAdmin } from '@shared/decorators/admin.decorator';
+import { RequiresSensitive } from '@shared/decorators/sensitive.decorator';
+import { RequiresResourceAction } from '@shared/decorators/resource-action.decorator';
 
 @ApiTags('admin')
 @Controller('admin')
-@UseGuards(RolesGuard)
-@Roles(RolesEnum.ADMIN)
+@UseGuards(PermissionsGuard)
+@RequiresAdmin()
 @ApiBearerAuth('JWT-auth')
 export class AdminController {
   constructor() {}
@@ -27,6 +28,39 @@ export class AdminController {
         activeUsers: 0,
         totalRoles: 0,
       },
+    };
+  }
+
+  @Get('system-info')
+  @HttpCode(HttpStatus.OK)
+  @RequiresSensitive()
+  @ApiOperation({ summary: 'Get system information (Requires 2FA)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Returns system information' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'User does not have 2FA enabled' })
+  async getSystemInfo() {
+    return {
+      message: 'Sensitive system information',
+      system: {
+        version: '1.0.0',
+        environment: process.env.NODE_ENV,
+        uptime: process.uptime(),
+      },
+    };
+  }
+
+  @Get('audit-logs')
+  @HttpCode(HttpStatus.OK)
+  @RequiresResourceAction('audit', 'read')
+  @ApiOperation({ summary: 'Get audit logs (Requires specific permission)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Returns audit logs' })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'User does not have audit:read permission',
+  })
+  async getAuditLogs() {
+    return {
+      message: 'Audit logs data',
+      logs: [],
     };
   }
 }

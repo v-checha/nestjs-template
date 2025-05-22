@@ -138,7 +138,7 @@ export class PasswordResetRepository
 
   private mapToModel(record: PrismaPasswordReset): PasswordReset {
     // Create value objects from primitive values
-    const userIdVO = new UserId(record.userId);
+    const userIdVO = UserId.fromString(record.userId);
     const emailVO = new Email(record.email);
     const tokenVO = new Token(record.token);
 

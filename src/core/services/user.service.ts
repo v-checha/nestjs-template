@@ -12,6 +12,8 @@ import {
 import { Email } from '@core/value-objects/email.vo';
 import { Password } from '@core/value-objects/password.vo';
 import { FirstName, LastName } from '@core/value-objects/name.vo';
+import { RoleId } from '@core/value-objects/role-id.vo';
+import { DomainValidationService } from './domain-validation.service';
 
 @Injectable()
 export class UserService {
@@ -20,6 +22,7 @@ export class UserService {
     private readonly userRepository: IUserRepository,
     @Inject(ROLE_REPOSITORY)
     private readonly roleRepository: IRoleRepository,
+    private readonly domainValidationService: DomainValidationService,
   ) {}
 
   async createUser(
@@ -44,7 +47,7 @@ export class UserService {
     const passwordHash = await this.hashPassword(password.getValue());
 
     // Create a new user with value objects for name
-    const user = new User(email, passwordHash, new FirstName(firstName), new LastName(lastName));
+    const user = User.create(email, passwordHash, new FirstName(firstName), new LastName(lastName));
 
     // Assign default role
     const defaultRole = await this.roleRepository.findDefaultRole();
@@ -90,17 +93,16 @@ export class UserService {
     emailStr?: string,
   ): Promise<User> {
     const user = await this.userRepository.findById(userId);
+
     if (!user) {
       throw new EntityNotFoundException('User', userId);
     }
 
-    if (firstName) {
-      user.firstName = new FirstName(firstName);
-    }
-
-    if (lastName) {
-      user.lastName = new LastName(lastName);
-    }
+    // Update profile with new names if provided
+    user.updateProfile(
+      firstName ? new FirstName(firstName) : undefined,
+      lastName ? new LastName(lastName) : undefined,
+    );
 
     if (emailStr) {
       // Validate email using value object
@@ -108,14 +110,15 @@ export class UserService {
 
       // Check if email is already in use by another user
       const existingUser = await this.userRepository.findByEmail(email.getValue());
-      if (existingUser && existingUser.id !== userId) {
+      // If the email is already in use, check if it's the same user
+      if (existingUser && existingUser.id.getValue() !== userId) {
         throw new EntityAlreadyExistsException('User', 'email');
       }
 
-      user.email = email;
+      user.changeEmail(email);
     }
 
-    user.updatedAt = new Date();
+    // Entity handles updating timestamps
 
     return this.userRepository.update(user);
   }
@@ -151,11 +154,16 @@ export class UserService {
       }
     }
 
+    // Validate password complexity using domain validation service
+    const passwordValidation =
+      this.domainValidationService.validatePasswordComplexity(newPasswordStr);
+    passwordValidation.throwIfInvalid();
+
     // Validate new password using value object
     const newPassword = new Password(newPasswordStr);
 
-    user.passwordHash = await this.hashPassword(newPassword.getValue());
-    user.updatedAt = new Date();
+    user.changePassword(await this.hashPassword(newPassword.getValue()));
+    // Entity handles updating timestamps
 
     return this.userRepository.update(user);
   }
@@ -171,6 +179,13 @@ export class UserService {
       throw new EntityNotFoundException('Role', roleId);
     }
 
+    // Validate role assignment using domain validation service
+    const roleAssignmentValidation = this.domainValidationService.validateRoleAssignment(
+      user,
+      role,
+    );
+    roleAssignmentValidation.throwIfInvalid();
+
     user.addRole(role);
 
     return this.userRepository.update(user);
@@ -182,7 +197,7 @@ export class UserService {
       throw new EntityNotFoundException('User', userId);
     }
 
-    user.removeRole(roleId);
+    user.removeRole(RoleId.fromString(roleId));
 
     return this.userRepository.update(user);
   }

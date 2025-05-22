@@ -13,7 +13,7 @@ export class UserMapper {
    */
   static toRoleResponse(role: Role): IUserRoleResponse {
     return {
-      id: role.id,
+      id: role.id.getValue(),
       name: role.name,
     };
   }
@@ -23,7 +23,7 @@ export class UserMapper {
    */
   static toBaseResponse(user: User, emailVerified: boolean = false): IUserBaseResponse {
     return {
-      id: user.id,
+      id: user.id.getValue(),
       email: user.email.getValue(),
       firstName: user.firstName.getValue(),
       lastName: user.lastName.getValue(),

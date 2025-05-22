@@ -98,14 +98,16 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
   async create(role: Role): Promise<Role> {
     const createdRole = await this.prisma.role.create({
       data: {
-        id: role.id,
+        id: role.id.getValue(),
         name: role.name,
         description: role.description,
         isDefault: role.isDefault,
         permissions: {
           create:
             role.permissions?.map(permission => ({
-              permissionId: permission.id,
+              permission: {
+                connect: { id: permission.id.getValue() },
+              },
             })) || [],
         },
       },
@@ -125,13 +127,13 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
     // First delete all permission associations to recreate them
     await this.prisma.rolePermission.deleteMany({
       where: {
-        roleId: role.id,
+        roleId: role.id.getValue(),
       },
     });
 
     // Update the role with new permission associations
     const updatedRole = await this.prisma.role.update({
-      where: { id: role.id },
+      where: { id: role.id.getValue() },
       data: {
         name: role.name,
         description: role.description,
@@ -139,7 +141,9 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
         permissions: {
           create:
             role.permissions?.map(permission => ({
-              permissionId: permission.id,
+              permission: {
+                connect: { id: permission.id.getValue() },
+              },
             })) || [],
         },
       },
@@ -168,15 +172,9 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
   }
 
   private mapToModel(record: RoleWithPermissions): Role {
-    const role = new Role(record.name, record.description, record.isDefault);
-
-    role.id = record.id;
-    role.createdAt = record.createdAt;
-    role.updatedAt = record.updatedAt;
-
-    // Map permissions
-    if (record.permissions) {
-      role.permissions = record.permissions.map(permissionRelation => {
+    // Map permissions first
+    const permissions =
+      record.permissions?.map(permissionRelation => {
         const permissionRecord = permissionRelation.permission;
 
         // Create ResourceAction value object
@@ -185,20 +183,23 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
           permissionRecord.action as ActionType,
         );
 
-        // Create Permission with ResourceAction
-        const permission = new Permission(
+        return Permission.fromData({
+          id: permissionRecord.id,
           resourceAction,
-          permissionRecord.description,
-          permissionRecord.id,
-        );
+          description: permissionRecord.description,
+          createdAt: permissionRecord.createdAt,
+          updatedAt: permissionRecord.updatedAt,
+        });
+      }) || [];
 
-        permission.createdAt = permissionRecord.createdAt;
-        permission.updatedAt = permissionRecord.updatedAt;
-
-        return permission;
-      });
-    }
-
-    return role;
+    return Role.fromData({
+      id: record.id,
+      name: record.name,
+      description: record.description,
+      isDefault: record.isDefault,
+      permissions,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    });
   }
 }

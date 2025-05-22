@@ -11,8 +11,6 @@ import {
   Role as PrismaRole,
   Permission as PrismaPermission,
 } from '@prisma/client';
-import { Email } from '@core/value-objects/email.vo';
-import { FirstName, LastName } from '@core/value-objects/name.vo';
 import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
 import { BaseRepository } from './base.repository';
 
@@ -150,7 +148,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
     return this.executeWithErrorHandling('create', async () => {
       const createdUser = await this.prisma.user.create({
         data: {
-          id: user.id,
+          id: user.id.getValue(),
           email: user.email.getValue(),
           passwordHash: user.passwordHash,
           firstName: user.firstName.getValue(),
@@ -161,7 +159,9 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
           lastLoginAt: user.lastLoginAt,
           roles: {
             create: user.roles.map(role => ({
-              roleId: role.id,
+              role: {
+                connect: { id: role.id.getValue() },
+              },
             })),
           },
         },
@@ -191,13 +191,13 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
       // First, delete all role associations to recreate them
       await this.prisma.userRole.deleteMany({
         where: {
-          userId: user.id,
+          userId: user.id.getValue(),
         },
       });
 
       // Update the user with new role associations
       const updatedUser = await this.prisma.user.update({
-        where: { id: user.id },
+        where: { id: user.id.getValue() },
         data: {
           email: user.email.getValue(),
           passwordHash: user.passwordHash,
@@ -209,7 +209,9 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
           lastLoginAt: user.lastLoginAt,
           roles: {
             create: user.roles.map(role => ({
-              roleId: role.id,
+              role: {
+                connect: { id: role.id.getValue() },
+              },
             })),
           },
         },
@@ -249,33 +251,13 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
   }
 
   private mapToModel(record: UserWithRelations): User {
-    // Create value objects from primitive values
-    const emailVO = new Email(record.email);
-    const firstNameVO = new FirstName(record.firstName);
-    const lastNameVO = new LastName(record.lastName);
-
-    const user = new User(emailVO, record.passwordHash, firstNameVO, lastNameVO);
-
-    user.id = record.id;
-    user.isActive = record.isActive;
-    user.otpEnabled = record.otpEnabled;
-    user.otpSecret = record.otpSecret || undefined;
-    user.lastLoginAt = record.lastLoginAt || undefined;
-    user.createdAt = record.createdAt;
-    user.updatedAt = record.updatedAt;
-
-    // Map roles
-    user.roles = record.roles.map(roleRelation => {
+    // Map roles first
+    const roles = record.roles.map(roleRelation => {
       const roleRecord = roleRelation.role;
-      const role = new Role(roleRecord.name, roleRecord.description, roleRecord.isDefault);
-
-      role.id = roleRecord.id;
-      role.createdAt = roleRecord.createdAt;
-      role.updatedAt = roleRecord.updatedAt;
 
       // Map permissions
-      if (roleRecord.permissions) {
-        role.permissions = roleRecord.permissions.map(permissionRelation => {
+      const permissions =
+        roleRecord.permissions?.map(permissionRelation => {
           const permissionRecord = permissionRelation.permission;
 
           // Create the ResourceAction value object
@@ -284,23 +266,39 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
             permissionRecord.action as ActionType,
           );
 
-          // Create the Permission entity with the value object
-          const permission = new Permission(
+          return Permission.fromData({
+            id: permissionRecord.id,
             resourceAction,
-            permissionRecord.description,
-            permissionRecord.id,
-          );
+            description: permissionRecord.description,
+            createdAt: permissionRecord.createdAt,
+            updatedAt: permissionRecord.updatedAt,
+          });
+        }) || [];
 
-          permission.createdAt = permissionRecord.createdAt;
-          permission.updatedAt = permissionRecord.updatedAt;
-
-          return permission;
-        });
-      }
-
-      return role;
+      return Role.fromData({
+        id: roleRecord.id,
+        name: roleRecord.name,
+        description: roleRecord.description,
+        isDefault: roleRecord.isDefault,
+        permissions,
+        createdAt: roleRecord.createdAt,
+        updatedAt: roleRecord.updatedAt,
+      });
     });
 
-    return user;
+    return User.fromData({
+      id: record.id,
+      email: record.email,
+      passwordHash: record.passwordHash,
+      firstName: record.firstName,
+      lastName: record.lastName,
+      isActive: record.isActive,
+      otpEnabled: record.otpEnabled,
+      otpSecret: record.otpSecret || undefined,
+      roles,
+      lastLoginAt: record.lastLoginAt || undefined,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    });
   }
 }

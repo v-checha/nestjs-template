@@ -59,34 +59,47 @@ const mockLoggerService = {
 
 // Create utility functions for test data
 const createTestUser = (): User => {
-  const user = new User(
+  const user = User.create(
     new Email('test@example.com'),
     'hashedPassword',
     new FirstName('John'),
     new LastName('Doe'),
-    '550e8400-e29b-41d4-a716-446655440000',
   );
 
   // Add roles
-  const role = new Role('user', 'Regular user role', true);
-  role.id = '550e8400-e29b-41d4-a716-446655440001'; // Set ID manually
+  const role = Role.fromData({
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'user',
+    description: 'Regular user role',
+    isDefault: true,
+    permissions: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   user.addRole(role);
 
   return user;
 };
 
 const createRoleWithPermissions = (): Role => {
-  const role = new Role('user', 'Regular user role', true);
-  role.id = '550e8400-e29b-41d4-a716-446655440001'; // Set ID manually
-
-  // Add permissions
   const resourceAction = new ResourceAction('user', ActionType.READ);
-  const permission = new Permission(
+  const permission = Permission.fromData({
+    id: '550e8400-e29b-41d4-a716-446655440002',
     resourceAction,
-    'Can read user details',
-    '550e8400-e29b-41d4-a716-446655440002',
-  );
-  role.permissions = [permission];
+    description: 'Can read user details',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  const role = Role.fromData({
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    name: 'user',
+    description: 'Regular user role',
+    isDefault: true,
+    permissions: [permission],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 
   return role;
 };
@@ -123,13 +136,13 @@ describe('LoginCommandHandler', () => {
     // Mock UserMapper if needed
     jest.spyOn(UserMapper, 'toAuthResponse').mockImplementation((user, emailVerified) => {
       return {
-        id: user.id,
+        id: user.id.getValue(),
         email: user.email.getValue(),
         firstName: user.firstName.getValue(),
         lastName: user.lastName.getValue(),
         emailVerified: emailVerified || false,
         roles: user.roles.map(role => ({
-          id: role.id,
+          id: role.id.getValue(),
           name: role.name,
         })),
       };
@@ -175,7 +188,7 @@ describe('LoginCommandHandler', () => {
     // Assert
     expect(result).toEqual({
       requiresEmailVerification: true,
-      userId: user.id,
+      userId: user.id.getValue(),
       email: user.email.getValue(),
       message: 'Email verification required',
     });
@@ -184,7 +197,7 @@ describe('LoginCommandHandler', () => {
       'test@example.com',
       'Password123!',
     );
-    expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id);
+    expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id.getValue());
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
   });
 
@@ -196,8 +209,7 @@ describe('LoginCommandHandler', () => {
     });
 
     const user = createTestUser();
-    user.otpEnabled = true;
-    user.otpSecret = 'OTPSECRETBASE32';
+    user.enableTwoFactor('OTPSECRETBASE32');
 
     mockUserService.validateCredentials.mockResolvedValue(user);
     mockAuthService.updateLastLogin.mockResolvedValue(user);
@@ -209,7 +221,7 @@ describe('LoginCommandHandler', () => {
     // Assert
     expect(result).toEqual({
       requiresOtp: true,
-      userId: user.id,
+      userId: user.id.getValue(),
       message: 'OTP verification required',
     });
 
@@ -217,7 +229,7 @@ describe('LoginCommandHandler', () => {
       'test@example.com',
       'Password123!',
     );
-    expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id);
+    expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id.getValue());
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
   });
 
@@ -249,7 +261,7 @@ describe('LoginCommandHandler', () => {
       refreshToken: 'test-refresh-token',
       message: 'Login successful',
       user: expect.objectContaining({
-        id: user.id,
+        id: user.id.getValue(),
         email: user.email.getValue(),
         emailVerified: true,
       }),
@@ -259,9 +271,9 @@ describe('LoginCommandHandler', () => {
       'test@example.com',
       'Password123!',
     );
-    expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id);
+    expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id.getValue());
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
-    expect(roleRepository.findById).toHaveBeenCalledWith(user.roles[0].id);
+    expect(roleRepository.findById).toHaveBeenCalledWith(user.roles[0].id.getValue());
     expect(tokenProvider.generateTokens).toHaveBeenCalledWith(user, ['user:read'], true);
     expect(UserMapper.toAuthResponse).toHaveBeenCalledWith(user, true);
   });
@@ -275,23 +287,42 @@ describe('LoginCommandHandler', () => {
 
     const user = createTestUser();
 
-    // Add another role to the user
-    const adminRole = new Role('admin', 'Administrator role', false);
-    adminRole.id = '550e8400-e29b-41d4-a716-446655440003'; // Set ID manually
+    // Add another role to the user - mock the eligibility check
+    const adminRole = Role.fromData({
+      id: '550e8400-e29b-41d4-a716-446655440003',
+      name: 'admin',
+      description: 'Administrator role',
+      isDefault: false,
+      permissions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Mock the eligibility check to allow admin role assignment
+    jest.spyOn(user, 'isEligibleForAdminRole').mockReturnValue(true);
     user.addRole(adminRole);
 
     // Create roles with permissions for repository responses
     const userRoleWithPermissions = createRoleWithPermissions();
 
-    const adminRoleWithPermissions = new Role('admin', 'Administrator role', false);
-    adminRoleWithPermissions.id = '550e8400-e29b-41d4-a716-446655440003'; // Set ID manually
     const adminResourceAction = new ResourceAction('user', ActionType.WRITE);
-    const adminPermission = new Permission(
-      adminResourceAction,
-      'Can write user details',
-      '550e8400-e29b-41d4-a716-446655440004',
-    );
-    adminRoleWithPermissions.permissions = [adminPermission];
+    const adminPermission = Permission.fromData({
+      id: '550e8400-e29b-41d4-a716-446655440004',
+      resourceAction: adminResourceAction,
+      description: 'Can write user details',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const adminRoleWithPermissions = Role.fromData({
+      id: '550e8400-e29b-41d4-a716-446655440003',
+      name: 'admin',
+      description: 'Administrator role',
+      isDefault: false,
+      permissions: [adminPermission],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     mockUserService.validateCredentials.mockResolvedValue(user);
     mockAuthService.updateLastLogin.mockResolvedValue(user);

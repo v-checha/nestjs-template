@@ -95,7 +95,7 @@ export class OtpRepository extends BaseRepository<Otp> implements IOtpRepository
     const expirationMinutes = this.configService.get<number>('OTP_EXPIRATION', 5);
 
     // Create value object from primitive value
-    const userIdVO = new UserId(record.userId);
+    const userIdVO = UserId.fromString(record.userId);
 
     const otp = new Otp(userIdVO, record.secret, expirationMinutes);
 

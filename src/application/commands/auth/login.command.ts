@@ -42,10 +42,14 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
       throw new UnauthorizedException(this.i18n.t('common.auth.login.failed'));
     }
 
-    this.logger.debug({ message: 'Credentials validated successfully', userId: user.id, email });
+    this.logger.debug({
+      message: 'Credentials validated successfully',
+      userId: user.id.getValue(),
+      email,
+    });
 
     // Update last login
-    await this.authService.updateLastLogin(user.id);
+    await this.authService.updateLastLogin(user.id.getValue());
 
     // Check if email is verified
     const isEmailVerified = await this.authService.isEmailVerified(email);
@@ -54,13 +58,13 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     if (!isEmailVerified) {
       this.logger.debug({
         message: 'Login requires email verification',
-        userId: user.id,
+        userId: user.id.getValue(),
         email,
       });
 
       return {
         requiresEmailVerification: true,
-        userId: user.id,
+        userId: user.id.getValue(),
         email: user.email.getValue(),
         message: this.i18n.t('common.auth.verification.email_sent'),
       };
@@ -70,13 +74,13 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     if (user.otpEnabled) {
       this.logger.debug({
         message: 'Login requires 2FA verification',
-        userId: user.id,
+        userId: user.id.getValue(),
         email,
       });
 
       return {
         requiresOtp: true,
-        userId: user.id,
+        userId: user.id.getValue(),
         message: this.i18n.t('common.auth.2fa.enabled'),
       };
     }
@@ -84,7 +88,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     // Collect all permissions from all user roles
     const userPermissions = new Set<string>();
     for (const role of user.roles) {
-      const roleWithPermissions = await this.roleRepository.findById(role.id);
+      const roleWithPermissions = await this.roleRepository.findById(role.id.getValue());
       if (roleWithPermissions && roleWithPermissions.permissions) {
         roleWithPermissions.permissions.forEach(permission => {
           userPermissions.add(permission.getStringName());
@@ -94,7 +98,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
     this.logger.debug({
       message: 'User permissions collected',
-      userId: user.id,
+      userId: user.id.getValue(),
       roles: user.roles.map(r => r.name),
       permissionsCount: userPermissions.size,
     });
@@ -108,7 +112,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
     this.logger.log({
       message: 'Login successful',
-      userId: user.id,
+      userId: user.id.getValue(),
       email,
     });
 

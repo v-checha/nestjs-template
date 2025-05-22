@@ -7,6 +7,7 @@ import {
   EntityAlreadyExistsException,
   ForbiddenActionException,
 } from '@core/exceptions/domain-exceptions';
+import { PermissionId } from '@core/value-objects/permission-id.vo';
 import { ROLE_REPOSITORY, PERMISSION_REPOSITORY } from '@shared/constants/tokens';
 
 @Injectable()
@@ -29,12 +30,12 @@ export class RoleService {
     if (isDefault) {
       const currentDefaultRole = await this.roleRepository.findDefaultRole();
       if (currentDefaultRole) {
-        currentDefaultRole.setDefault(false);
+        currentDefaultRole.removeAsDefault();
         await this.roleRepository.update(currentDefaultRole);
       }
     }
 
-    const role = new Role(name, description, isDefault);
+    const role = Role.create(name, description, isDefault);
 
     return this.roleRepository.create(role);
   }
@@ -52,29 +53,30 @@ export class RoleService {
 
     if (name) {
       const existingRole = await this.roleRepository.findByName(name);
-      if (existingRole && existingRole.id !== id) {
+      if (existingRole && existingRole.id.getValue() !== id) {
         throw new EntityAlreadyExistsException('Role', 'name');
       }
-      role.name = name;
     }
 
-    if (description) {
-      role.description = description;
-    }
+    role.updateDetails(name, description);
 
     if (isDefault !== undefined) {
       // If making this role default, unset any existing default role
       if (isDefault && !role.isDefault) {
         const currentDefaultRole = await this.roleRepository.findDefaultRole();
-        if (currentDefaultRole && currentDefaultRole.id !== id) {
-          currentDefaultRole.setDefault(false);
+        if (currentDefaultRole && currentDefaultRole.id.getValue() !== id) {
+          currentDefaultRole.removeAsDefault();
           await this.roleRepository.update(currentDefaultRole);
         }
       }
-      role.setDefault(isDefault);
+      if (isDefault) {
+        role.setAsDefault();
+      } else {
+        role.removeAsDefault();
+      }
     }
 
-    role.updatedAt = new Date();
+    // The entity will handle updating the updatedAt timestamp
 
     return this.roleRepository.update(role);
   }
@@ -101,7 +103,7 @@ export class RoleService {
       throw new EntityNotFoundException('Role', roleId);
     }
 
-    role.removePermission(permissionId);
+    role.removePermission(PermissionId.fromString(permissionId));
 
     return this.roleRepository.update(role);
   }

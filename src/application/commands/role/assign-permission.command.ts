@@ -30,7 +30,7 @@ export class AssignPermissionCommandHandler
     const role = await this.roleService.assignPermissionToRole(roleId, permissionId);
 
     // Fetch the updated role with permissions
-    const updatedRole = await this.roleRepository.findById(role.id);
+    const updatedRole = await this.roleRepository.findById(role.id.getValue());
 
     if (!updatedRole) {
       throw new Error('Role not found after update');

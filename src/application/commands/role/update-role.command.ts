@@ -32,7 +32,7 @@ export class UpdateRoleCommandHandler
     const role = await this.roleService.updateRole(id, name, description, isDefault);
 
     // Fetch the updated role with permissions
-    const updatedRole = await this.roleRepository.findById(role.id);
+    const updatedRole = await this.roleRepository.findById(role.id.getValue());
 
     if (!updatedRole) {
       throw new Error('Role not found after update');

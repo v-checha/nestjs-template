@@ -81,7 +81,7 @@ export class AuthService {
     }).base32;
 
     // Create a new OTP entity
-    const otp = new Otp(new UserId(userId), secret, this.otpConfig.expiration);
+    const otp = new Otp(UserId.fromString(userId), secret, this.otpConfig.expiration);
 
     // Save the OTP
     await this.otpRepository.create(otp);
@@ -206,7 +206,7 @@ export class AuthService {
 
     // Create a new refresh token
     const refreshToken = new RefreshToken(
-      new UserId(userId),
+      UserId.fromString(userId),
       new Token(token),
       this.tokenConfig.refreshExpiration,
     );
@@ -389,11 +389,11 @@ export class AuthService {
       }
 
       // Delete any existing password reset tokens for this user
-      await this.passwordResetRepository.deleteByUserId(user.id);
+      await this.passwordResetRepository.deleteByUserId(user.id.getValue());
 
       // Create a new password reset token
       const passwordReset = new PasswordReset(
-        new UserId(user.id),
+        user.id,
         new Email(email),
         60, // 1-hour expiration
       );
@@ -465,7 +465,7 @@ export class AuthService {
     const passwordReset = await this.passwordResetRepository.findByToken(token);
 
     // Set the new password
-    user.setPassword(newPassword);
+    user.changePassword(newPassword);
     await this.userRepository.update(user);
 
     // Mark the token as used
@@ -473,7 +473,7 @@ export class AuthService {
     await this.passwordResetRepository.update(passwordReset);
 
     // Revoke all refresh tokens for this user
-    await this.refreshTokenRepository.deleteByUserId(user.id);
+    await this.refreshTokenRepository.deleteByUserId(user.id.getValue());
 
     this.logger.log({
       message: 'Password reset completed successfully',

@@ -129,7 +129,7 @@ export class RefreshTokenRepository
     );
 
     // Create value objects from primitive values
-    const userIdVO = new UserId(record.userId);
+    const userIdVO = UserId.fromString(record.userId);
     const tokenVO = new Token(record.token);
 
     const refreshToken = new RefreshToken(userIdVO, tokenVO, refreshExpiration);

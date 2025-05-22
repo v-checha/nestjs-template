@@ -79,3 +79,124 @@ export class InvalidThrottleIdentifierException extends DomainException {
     super('Throttle identifier cannot be empty', HttpStatus.BAD_REQUEST);
   }
 }
+
+// Domain-specific exception hierarchies
+export abstract class UserDomainException extends DomainException {}
+export abstract class RoleDomainException extends DomainException {}
+export abstract class AuthenticationDomainException extends DomainException {}
+export abstract class FileDomainException extends DomainException {}
+
+// User domain exceptions
+export class UserNotEligibleForRoleException extends UserDomainException {
+  constructor(userId: string, roleName: string) {
+    super(`User ${userId} is not eligible for role: ${roleName}`, HttpStatus.FORBIDDEN);
+  }
+}
+
+export class UserAlreadyHasRoleException extends UserDomainException {
+  constructor(userId: string, roleName: string) {
+    super(`User ${userId} already has role: ${roleName}`, HttpStatus.CONFLICT);
+  }
+}
+
+export class InactiveUserException extends UserDomainException {
+  constructor(operation: string) {
+    super(`Cannot ${operation} for inactive user`, HttpStatus.FORBIDDEN);
+  }
+}
+
+export class UserCannotRemoveLastRoleException extends UserDomainException {
+  constructor() {
+    super('Cannot remove the last role from user', HttpStatus.FORBIDDEN);
+  }
+}
+
+// Role domain exceptions
+export class CannotDeleteDefaultRoleException extends RoleDomainException {
+  constructor() {
+    super('Cannot delete default role', HttpStatus.FORBIDDEN);
+  }
+}
+
+export class RoleHasAssignedUsersException extends RoleDomainException {
+  constructor(roleName: string) {
+    super(`Cannot delete role ${roleName} as it has assigned users`, HttpStatus.CONFLICT);
+  }
+}
+
+export class PermissionAlreadyAssignedException extends RoleDomainException {
+  constructor(permissionName: string, roleName: string) {
+    super(
+      `Permission ${permissionName} is already assigned to role ${roleName}`,
+      HttpStatus.CONFLICT,
+    );
+  }
+}
+
+// Authentication domain exceptions
+export class InvalidCredentialsException extends AuthenticationDomainException {
+  constructor() {
+    super('Invalid credentials provided', HttpStatus.UNAUTHORIZED);
+  }
+}
+
+export class AccountLockedException extends AuthenticationDomainException {
+  constructor() {
+    super('Account is locked', HttpStatus.FORBIDDEN);
+  }
+}
+
+export class TwoFactorRequiredException extends AuthenticationDomainException {
+  constructor() {
+    super('Two-factor authentication required', HttpStatus.UNAUTHORIZED);
+  }
+}
+
+// File domain exceptions
+export class FileNotOwnedByUserException extends FileDomainException {
+  constructor(fileId: string, userId: string) {
+    super(`File ${fileId} is not owned by user ${userId}`, HttpStatus.FORBIDDEN);
+  }
+}
+
+export class FileAccessDeniedException extends FileDomainException {
+  constructor(fileId: string) {
+    super(`Access denied to file ${fileId}`, HttpStatus.FORBIDDEN);
+  }
+}
+
+export class InvalidFileOperationException extends FileDomainException {
+  constructor(operation: string, reason: string) {
+    super(`Cannot ${operation}: ${reason}`, HttpStatus.BAD_REQUEST);
+  }
+}
+
+// Validation exceptions
+export class BusinessRuleValidationException extends DomainException {
+  constructor(message: string) {
+    super(message, HttpStatus.BAD_REQUEST);
+    this.name = 'BusinessRuleValidationException';
+  }
+}
+
+// Health check exceptions
+export class HealthCheckException extends DomainException {
+  constructor(message: string) {
+    super(message, HttpStatus.SERVICE_UNAVAILABLE);
+    this.name = 'HealthCheckException';
+  }
+}
+
+export class DatabaseConnectionException extends HealthCheckException {
+  constructor(message: string) {
+    super(`Database connection error: ${message}`);
+    this.name = 'DatabaseConnectionException';
+  }
+}
+
+export class ConfigurationException extends HealthCheckException {
+  constructor(message: string) {
+    super(`Configuration error: ${message}`);
+    this.name = 'ConfigurationException';
+  }
+}

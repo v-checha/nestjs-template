@@ -65,7 +65,7 @@ export class PermissionRepository
     return this.executeWithErrorHandling('create', async () => {
       const createdPermission = await this.prisma.permission.create({
         data: {
-          id: permission.id,
+          id: permission.id.getValue(),
           name: permission.name.getValue(),
           description: permission.description,
           resource: permission.resourceAction.getResource(),
@@ -80,7 +80,7 @@ export class PermissionRepository
   async update(permission: Permission): Promise<Permission> {
     return this.executeWithErrorHandling('update', async () => {
       const updatedPermission = await this.prisma.permission.update({
-        where: { id: permission.id },
+        where: { id: permission.id.getValue() },
         data: {
           name: permission.name.getValue(),
           description: permission.description,
@@ -111,11 +111,12 @@ export class PermissionRepository
     // Create value objects from primitive values
     const resourceAction = new ResourceAction(record.resource, record.action as ActionType);
 
-    const permission = new Permission(resourceAction, record.description, record.id);
-
-    permission.createdAt = record.createdAt;
-    permission.updatedAt = record.updatedAt;
-
-    return permission;
+    return Permission.fromData({
+      id: record.id,
+      resourceAction,
+      description: record.description,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    });
   }
 }

@@ -48,7 +48,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
     // Collect all permissions from all user roles
     const userPermissions = new Set<string>();
     for (const role of user.roles) {
-      const roleWithPermissions = await this.roleRepository.findById(role.id);
+      const roleWithPermissions = await this.roleRepository.findById(role.id.getValue());
       if (roleWithPermissions && roleWithPermissions.permissions) {
         roleWithPermissions.permissions.forEach(permission => {
           userPermissions.add(permission.getStringName());
@@ -61,7 +61,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
 
     // Generate new JWT tokens
     const payload = {
-      sub: user.id,
+      sub: user.id.getValue(),
       email: user.email.getValue(),
       emailVerified: isEmailVerified,
       roles: user.roles.map(role => role.name),
@@ -74,7 +74,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
     });
 
     const newRefreshToken = uuidv4();
-    await this.authService.createRefreshToken(user.id, newRefreshToken);
+    await this.authService.createRefreshToken(user.id.getValue(), newRefreshToken);
 
     return {
       accessToken,
