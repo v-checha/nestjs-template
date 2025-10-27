@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UnauthorizedException } from '@nestjs/common';
-import { LoginCommand, LoginCommandHandler } from './login.command';
-import { UserService } from '@core/services/user.service';
-import { AuthService } from '@core/services/auth.service';
-import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
 import { UserMapper } from '@application/mappers/user.mapper';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { Permission } from '@core/entities/permission.entity';
+import { Role } from '@core/entities/role.entity';
 import { User } from '@core/entities/user.entity';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { AuthService } from '@core/services/auth.service';
+import { UserService } from '@core/services/user.service';
 import { Email } from '@core/value-objects/email.vo';
 import { FirstName, LastName } from '@core/value-objects/name.vo';
-import { Role } from '@core/entities/role.entity';
-import { Permission } from '@core/entities/permission.entity';
-import { ResourceAction, ActionType, ResourceType } from '@core/value-objects/resource-action.vo';
-import { I18nService } from 'nestjs-i18n';
+import { ActionType, ResourceAction, ResourceType } from '@core/value-objects/resource-action.vo';
 import { LoggerService } from '@infrastructure/logger/logger.service';
+import { UnauthorizedException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
 import { ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { I18nService } from 'nestjs-i18n';
+import { LoginCommand, LoginCommandHandler } from './login.command';
 
 // Mock dependencies
 const mockUserService = {
@@ -259,7 +259,6 @@ describe('LoginCommandHandler', () => {
     expect(result).toEqual({
       accessToken: 'test-access-token',
       refreshToken: 'test-refresh-token',
-      message: 'Login successful',
       user: expect.objectContaining({
         id: user.id.getValue(),
         email: user.email.getValue(),

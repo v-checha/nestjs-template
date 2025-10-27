@@ -1,22 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { RefreshTokenCommand, RefreshTokenCommandHandler } from './refresh-token.command';
-import { AuthService } from '@core/services/auth.service';
-import { IUserRepository } from '@core/repositories/user.repository.interface';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
-import { LoggerService } from '@infrastructure/logger/logger.service';
+import { Permission } from '@core/entities/permission.entity';
 import { RefreshToken } from '@core/entities/refresh-token.entity';
+import { Role } from '@core/entities/role.entity';
 import { User } from '@core/entities/user.entity';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { IUserRepository } from '@core/repositories/user.repository.interface';
+import { AuthService } from '@core/services/auth.service';
 import { Email } from '@core/value-objects/email.vo';
 import { FirstName, LastName } from '@core/value-objects/name.vo';
-import { UserId } from '@core/value-objects/user-id.vo';
+import { ActionType, ResourceAction, ResourceType } from '@core/value-objects/resource-action.vo';
 import { Token } from '@core/value-objects/token.vo';
-import { Role } from '@core/entities/role.entity';
-import { Permission } from '@core/entities/permission.entity';
-import { ResourceAction, ActionType, ResourceType } from '@core/value-objects/resource-action.vo';
-import { USER_REPOSITORY, ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { UserId } from '@core/value-objects/user-id.vo';
+import { LoggerService } from '@infrastructure/logger/logger.service';
+import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ROLE_REPOSITORY, USER_REPOSITORY } from '@shared/constants/tokens';
+import { RefreshTokenCommand, RefreshTokenCommandHandler } from './refresh-token.command';
 
 // Mock UUID generation
 jest.mock('uuid', () => ({
@@ -178,6 +178,7 @@ describe('RefreshTokenCommandHandler', () => {
     expect(result).toEqual({
       accessToken: 'new-access-token',
       refreshToken: '550e8400-e29b-41d4-a716-446655440010',
+      userId: '550e8400-e29b-41d4-a716-446655440010',
     });
 
     expect(authService.validateRefreshToken).toHaveBeenCalledWith(
