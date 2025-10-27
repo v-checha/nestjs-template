@@ -1,25 +1,27 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RequestPasswordResetRequest } from '@application/dtos';
-import { Injectable } from '@nestjs/common';
-import { AuthService } from '@core/services/auth.service';
-import { EmailProvider } from '@presentation/modules/auth/providers/email.provider';
 import { EntityNotFoundException } from '@core/exceptions/domain-exceptions';
+import { AuthService } from '@core/services/auth.service';
+import { Injectable } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { EmailProvider } from '@presentation/modules/auth/providers/email.provider';
 
-export class RequestPasswordResetCommand implements ICommand {
-  constructor(public readonly dto: RequestPasswordResetRequest) {}
+export class RequestPasswordResetCommand extends Command<{ message: string }> {
+  constructor(public readonly dto: RequestPasswordResetRequest) {
+    super();
+  }
 }
 
 @Injectable()
 @CommandHandler(RequestPasswordResetCommand)
 export class RequestPasswordResetCommandHandler
-  implements ICommandHandler<RequestPasswordResetCommand, { message: string }>
+  implements ICommandHandler<RequestPasswordResetCommand>
 {
   constructor(
     private readonly authService: AuthService,
     private readonly emailProvider: EmailProvider,
   ) {}
 
-  async execute(command: RequestPasswordResetCommand): Promise<{ message: string }> {
+  async execute(command: RequestPasswordResetCommand) {
     const { email } = command.dto;
 
     try {

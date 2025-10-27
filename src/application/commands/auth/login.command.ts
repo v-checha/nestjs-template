@@ -1,17 +1,19 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { LoginRequest, AuthResponse } from '@application/dtos';
-import { UnauthorizedException, Injectable, Inject } from '@nestjs/common';
-import { UserService } from '@core/services/user.service';
-import { AuthService } from '@core/services/auth.service';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
-import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
+import { AuthResponse, LoginRequest } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
-import { I18nService } from 'nestjs-i18n';
-import { ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { AuthService } from '@core/services/auth.service';
+import { UserService } from '@core/services/user.service';
 import { LoggerService } from '@infrastructure/logger/logger.service';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
+import { ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { I18nService } from 'nestjs-i18n';
 
-export class LoginCommand implements ICommand {
-  constructor(public readonly loginDto: LoginRequest) {}
+export class LoginCommand extends Command<AuthResponse> {
+  constructor(public readonly loginDto: LoginRequest) {
+    super();
+  }
 }
 
 @Injectable()

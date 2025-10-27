@@ -1,20 +1,20 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserService } from '@core/services/user.service';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class VerifyPasswordCommand {
+export class VerifyPasswordCommand extends Command<boolean> {
   constructor(
     public readonly userId: string,
     public readonly password: string,
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @CommandHandler(VerifyPasswordCommand)
-export class VerifyPasswordCommandHandler
-  implements ICommandHandler<VerifyPasswordCommand, boolean>
-{
+export class VerifyPasswordCommandHandler implements ICommandHandler<VerifyPasswordCommand> {
   constructor(private readonly userService: UserService) {}
 
-  async execute(command: VerifyPasswordCommand): Promise<boolean> {
+  async execute(command: VerifyPasswordCommand) {
     const { userId, password } = command;
 
     return this.userService.verifyCurrentPassword(userId, password);

@@ -1,13 +1,15 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Injectable, Inject } from '@nestjs/common';
 import { UserService } from '@core/services/user.service';
 import { LoggerService } from '@infrastructure/logger/logger.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class AdminChangePasswordCommand implements ICommand {
+export class AdminChangePasswordCommand extends Command<void> {
   constructor(
     public readonly userId: string,
     public readonly newPassword: string,
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @Injectable()
@@ -22,7 +24,7 @@ export class AdminChangePasswordCommandHandler
     this.logger.setContext(AdminChangePasswordCommandHandler.name);
   }
 
-  async execute(command: AdminChangePasswordCommand): Promise<void> {
+  async execute(command: AdminChangePasswordCommand) {
     const { userId, newPassword } = command;
 
     this.logger.log({

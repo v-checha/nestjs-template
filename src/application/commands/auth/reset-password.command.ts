@@ -1,29 +1,29 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ResetPasswordRequest } from '@application/dtos';
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { AuthService } from '@core/services/auth.service';
-import { UserService } from '@core/services/user.service';
 import {
   EntityNotFoundException,
   OtpExpiredException,
   OtpInvalidException,
 } from '@core/exceptions/domain-exceptions';
+import { AuthService } from '@core/services/auth.service';
+import { UserService } from '@core/services/user.service';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class ResetPasswordCommand implements ICommand {
-  constructor(public readonly dto: ResetPasswordRequest) {}
+export class ResetPasswordCommand extends Command<{ success: boolean; message: string }> {
+  constructor(public readonly dto: ResetPasswordRequest) {
+    super();
+  }
 }
 
 @Injectable()
 @CommandHandler(ResetPasswordCommand)
-export class ResetPasswordCommandHandler
-  implements ICommandHandler<ResetPasswordCommand, { success: boolean; message: string }>
-{
+export class ResetPasswordCommandHandler implements ICommandHandler<ResetPasswordCommand> {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
 
-  async execute(command: ResetPasswordCommand): Promise<{ success: boolean; message: string }> {
+  async execute(command: ResetPasswordCommand) {
     const { token, newPassword } = command.dto;
 
     try {

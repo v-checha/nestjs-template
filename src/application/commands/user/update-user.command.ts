@@ -1,9 +1,9 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UserService } from '@core/services/user.service';
 import { UserBaseResponse } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
+import { UserService } from '@core/services/user.service';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class UpdateUserCommand {
+export class UpdateUserCommand extends Command<UserBaseResponse> {
   constructor(
     public readonly userId: string,
     public readonly firstName?: string,
@@ -11,16 +11,16 @@ export class UpdateUserCommand {
     public readonly email?: string,
     public readonly roleIds?: string[],
     public readonly isActive?: boolean,
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @CommandHandler(UpdateUserCommand)
-export class UpdateUserCommandHandler
-  implements ICommandHandler<UpdateUserCommand, UserBaseResponse>
-{
+export class UpdateUserCommandHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(private readonly userService: UserService) {}
 
-  async execute(command: UpdateUserCommand): Promise<UserBaseResponse> {
+  async execute(command: UpdateUserCommand) {
     const { userId, firstName, lastName, email, roleIds, isActive } = command;
 
     const user = await this.userService.updateUserDetails(

@@ -1,19 +1,21 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Injectable } from '@nestjs/common';
 import { AuthService } from '@core/services/auth.service';
+import { Injectable } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class CheckEmailVerificationStatusCommand implements ICommand {
-  constructor(public readonly email: string) {}
+export class CheckEmailVerificationStatusCommand extends Command<boolean> {
+  constructor(public readonly email: string) {
+    super();
+  }
 }
 
 @Injectable()
 @CommandHandler(CheckEmailVerificationStatusCommand)
 export class CheckEmailVerificationStatusCommandHandler
-  implements ICommandHandler<CheckEmailVerificationStatusCommand, boolean>
+  implements ICommandHandler<CheckEmailVerificationStatusCommand>
 {
   constructor(private readonly authService: AuthService) {}
 
-  async execute(command: CheckEmailVerificationStatusCommand): Promise<boolean> {
+  async execute(command: CheckEmailVerificationStatusCommand) {
     const { email } = command;
 
     // Check if the email is verified

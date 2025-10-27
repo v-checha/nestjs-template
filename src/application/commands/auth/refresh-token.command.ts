@@ -1,16 +1,18 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RefreshTokenRequest, RefreshTokenResponse } from '@application/dtos';
-import { UnauthorizedException, Injectable, Inject } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { IUserRepository } from '@core/repositories/user.repository.interface';
 import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { IUserRepository } from '@core/repositories/user.repository.interface';
 import { AuthService } from '@core/services/auth.service';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
+import { ROLE_REPOSITORY, USER_REPOSITORY } from '@shared/constants/tokens';
 import { v4 as uuidv4 } from 'uuid';
-import { USER_REPOSITORY, ROLE_REPOSITORY } from '@shared/constants/tokens';
 
-export class RefreshTokenCommand implements ICommand {
-  constructor(public readonly refreshTokenDto: RefreshTokenRequest) {}
+export class RefreshTokenCommand extends Command<RefreshTokenResponse> {
+  constructor(public readonly refreshTokenDto: RefreshTokenRequest) {
+    super();
+  }
 }
 
 @Injectable()
@@ -26,7 +28,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
     private readonly configService: ConfigService,
   ) {}
 
-  async execute(command: RefreshTokenCommand): Promise<RefreshTokenResponse> {
+  async execute(command: RefreshTokenCommand) {
     const { refreshToken } = command.refreshTokenDto;
 
     // Validate refresh token

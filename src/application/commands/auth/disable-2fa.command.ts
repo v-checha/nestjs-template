@@ -1,21 +1,21 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Injectable } from '@nestjs/common';
-import { AuthService } from '@core/services/auth.service';
 import { UserBaseResponse } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
+import { AuthService } from '@core/services/auth.service';
+import { Injectable } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class Disable2FACommand implements ICommand {
-  constructor(public readonly userId: string) {}
+export class Disable2FACommand extends Command<UserBaseResponse> {
+  constructor(public readonly userId: string) {
+    super();
+  }
 }
 
 @Injectable()
 @CommandHandler(Disable2FACommand)
-export class Disable2FACommandHandler
-  implements ICommandHandler<Disable2FACommand, UserBaseResponse>
-{
+export class Disable2FACommandHandler implements ICommandHandler<Disable2FACommand> {
   constructor(private readonly authService: AuthService) {}
 
-  async execute(command: Disable2FACommand): Promise<UserBaseResponse> {
+  async execute(command: Disable2FACommand) {
     const { userId } = command;
 
     // Disable 2FA for the user

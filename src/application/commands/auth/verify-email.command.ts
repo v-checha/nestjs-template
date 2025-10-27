@@ -1,24 +1,24 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { VerifyEmailRequest, AuthTokenResponse } from '@application/dtos';
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { v4 as uuidv4 } from 'uuid';
-import { AuthService } from '@core/services/auth.service';
-import { IUserRepository } from '@core/repositories/user.repository.interface';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { AuthTokenResponse, VerifyEmailRequest } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
-import { USER_REPOSITORY, ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { IUserRepository } from '@core/repositories/user.repository.interface';
+import { AuthService } from '@core/services/auth.service';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
+import { ROLE_REPOSITORY, USER_REPOSITORY } from '@shared/constants/tokens';
+import { v4 as uuidv4 } from 'uuid';
 
-export class VerifyEmailCommand implements ICommand {
-  constructor(public readonly dto: VerifyEmailRequest) {}
+export class VerifyEmailCommand extends Command<AuthTokenResponse | { verified: boolean }> {
+  constructor(public readonly dto: VerifyEmailRequest) {
+    super();
+  }
 }
 
 @Injectable()
 @CommandHandler(VerifyEmailCommand)
-export class VerifyEmailCommandHandler
-  implements ICommandHandler<VerifyEmailCommand, AuthTokenResponse | { verified: boolean }>
-{
+export class VerifyEmailCommandHandler implements ICommandHandler<VerifyEmailCommand> {
   constructor(
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
@@ -29,7 +29,7 @@ export class VerifyEmailCommandHandler
     private readonly roleRepository: IRoleRepository,
   ) {}
 
-  async execute(command: VerifyEmailCommand): Promise<AuthTokenResponse | { verified: boolean }> {
+  async execute(command: VerifyEmailCommand) {
     const { email, code } = command.dto;
 
     // Verify the email code

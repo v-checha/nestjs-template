@@ -1,11 +1,13 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RegisterRequest, UserBaseResponse } from '@application/dtos';
-import { Injectable } from '@nestjs/common';
-import { UserService } from '@core/services/user.service';
 import { UserMapper } from '@application/mappers/user.mapper';
+import { UserService } from '@core/services/user.service';
+import { Injectable } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class RegisterUserCommand implements ICommand {
-  constructor(public readonly registerDto: RegisterRequest) {}
+export class RegisterUserCommand extends Command<UserBaseResponse> {
+  constructor(public readonly registerDto: RegisterRequest) {
+    super();
+  }
 }
 
 @Injectable()
@@ -13,7 +15,7 @@ export class RegisterUserCommand implements ICommand {
 export class RegisterUserCommandHandler implements ICommandHandler<RegisterUserCommand> {
   constructor(private readonly userService: UserService) {}
 
-  async execute(command: RegisterUserCommand): Promise<UserBaseResponse> {
+  async execute(command: RegisterUserCommand) {
     const { email, password, firstName, lastName } = command.registerDto;
 
     const user = await this.userService.createUser(email, password, firstName, lastName);

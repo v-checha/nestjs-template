@@ -1,19 +1,21 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { VerifyOtpRequest, AuthTokenResponse } from '@application/dtos';
-import { UnauthorizedException, Injectable, Inject } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { AuthTokenResponse, VerifyOtpRequest } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
 import { IUserRepository } from '@core/repositories/user.repository.interface';
 import { AuthService } from '@core/services/auth.service';
-import { v4 as uuidv4 } from 'uuid';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
 import { USER_REPOSITORY } from '@shared/constants/tokens';
+import { v4 as uuidv4 } from 'uuid';
 
-export class VerifyOtpCommand implements ICommand {
+export class VerifyOtpCommand extends Command<AuthTokenResponse> {
   constructor(
     public readonly userId: string,
     public readonly verifyOtpDto: VerifyOtpRequest,
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @Injectable()
@@ -27,7 +29,7 @@ export class VerifyOtpCommandHandler implements ICommandHandler<VerifyOtpCommand
     private readonly configService: ConfigService,
   ) {}
 
-  async execute(command: VerifyOtpCommand): Promise<AuthTokenResponse> {
+  async execute(command: VerifyOtpCommand) {
     const { userId, verifyOtpDto } = command;
 
     // Verify OTP

@@ -1,21 +1,21 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UserService } from '@core/services/user.service';
 import { UserBaseResponse } from '@application/dtos';
+import { UserService } from '@core/services/user.service';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-export class ActivateUserCommand {
+export class ActivateUserCommand extends Command<UserBaseResponse> {
   constructor(
     public readonly userId: string,
     public readonly active: boolean,
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @CommandHandler(ActivateUserCommand)
-export class ActivateUserCommandHandler
-  implements ICommandHandler<ActivateUserCommand, UserBaseResponse>
-{
+export class ActivateUserCommandHandler implements ICommandHandler<ActivateUserCommand> {
   constructor(private readonly userService: UserService) {}
 
-  async execute(command: ActivateUserCommand): Promise<UserBaseResponse> {
+  async execute(command: ActivateUserCommand) {
     const { userId, active } = command;
 
     let user;

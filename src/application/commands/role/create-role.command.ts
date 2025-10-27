@@ -1,32 +1,32 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { RoleService } from '@core/services/role.service';
 import { RoleDetailResponse } from '@application/dtos';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
 import { RoleMapper } from '@application/mappers/role.mapper';
 import { Role } from '@core/entities/role.entity';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { RoleService } from '@core/services/role.service';
+import { Inject } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ROLE_REPOSITORY } from '@shared/constants/tokens';
 
-export class CreateRoleCommand {
+export class CreateRoleCommand extends Command<RoleDetailResponse> {
   constructor(
     public readonly name: string,
     public readonly description: string,
     public readonly isDefault?: boolean,
     public readonly permissionIds?: string[],
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @CommandHandler(CreateRoleCommand)
-export class CreateRoleCommandHandler
-  implements ICommandHandler<CreateRoleCommand, RoleDetailResponse>
-{
+export class CreateRoleCommandHandler implements ICommandHandler<CreateRoleCommand> {
   constructor(
     private readonly roleService: RoleService,
     @Inject(ROLE_REPOSITORY)
     private readonly roleRepository: IRoleRepository,
   ) {}
 
-  async execute(command: CreateRoleCommand): Promise<RoleDetailResponse> {
+  async execute(command: CreateRoleCommand) {
     const { name, description, isDefault, permissionIds } = command;
 
     let role: Role;
