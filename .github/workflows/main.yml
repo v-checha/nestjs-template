@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: '18.x'
+  DATABASE_URL: ''
 
 jobs:
   lint:
