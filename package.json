@@ -41,8 +41,7 @@
     "db:migrate": "prisma migrate dev --name init",
     "db:push": "prisma db push",
     "db:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
-    "prepare": "husky",
-    "postinstall": "npm run db:generate"
+    "prepare": "husky"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.787.0",
