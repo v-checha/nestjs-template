@@ -28,8 +28,9 @@ module.exports = {
     },
   },
   moduleNameMapper: {
-    '^@core/(.*)$': '<rootDir>/src/core/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',
+    '^@core/(.*)$': '<rootDir>/src/core/$1',
+    '^@generated/(.*)$': '<rootDir>/generated/$1',
     '^@infrastructure/(.*)$': '<rootDir>/src/infrastructure/$1',
     '^@presentation/(.*)$': '<rootDir>/src/presentation/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',

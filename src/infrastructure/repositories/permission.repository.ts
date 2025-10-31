@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
 import { Permission } from '@core/entities/permission.entity';
 import { IPermissionRepository } from '@core/repositories/permission.repository.interface';
+import { ActionType, ResourceAction } from '@core/value-objects/resource-action.vo';
+import { Permission as PrismaPermission } from '@generated/prisma/client';
 import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
-import { Permission as PrismaPermission } from '@prisma/client';
-import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from './base.repository';
 
 @Injectable()

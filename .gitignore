@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/build
 
 # Logs
 logs
@@ -49,3 +50,4 @@ lerna-debug.log*
 # Prisma
 /prisma/.env
 /prisma/migrations/dev
+/generated/prisma

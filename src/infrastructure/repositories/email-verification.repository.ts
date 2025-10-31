@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import { EmailVerification } from '@core/entities/email-verification.entity';
 import { IEmailVerificationRepository } from '@core/repositories/email-verification.repository.interface';
-import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
-import { BaseRepository } from './base.repository';
 import { Email } from '@core/value-objects/email.vo';
 import { VerificationCode } from '@core/value-objects/verification-code.vo';
-import { EmailVerification as PrismaEmailVerification } from '@prisma/client';
+import { EmailVerification as PrismaEmailVerification } from '@generated/prisma/client';
+import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class EmailVerificationRepository

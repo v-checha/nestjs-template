@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Role } from '@core/entities/role.entity';
 import { Permission } from '@core/entities/permission.entity';
+import { Role } from '@core/entities/role.entity';
 import { IRoleRepository } from '@core/repositories/role.repository.interface';
-import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { ActionType, ResourceAction } from '@core/value-objects/resource-action.vo';
 import {
+  Permission as PrismaPermission,
   Role as PrismaRole,
   RolePermission as PrismaRolePermission,
-  Permission as PrismaPermission,
-} from '@prisma/client';
-import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
+} from '@generated/prisma/client';
+import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from './base.repository';
 
 // Define a type for Role with its related permissions

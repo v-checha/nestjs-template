@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@generated/prisma/client';
 import * as bcrypt from 'bcrypt';
-import { ResourceType, ActionType } from '../src/core/value-objects/resource-action.vo';
+import { ActionType, ResourceType } from '../src/core/value-objects/resource-action.vo';
 
 // Roles
 const roles = [

@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import { Otp } from '@core/entities/otp.entity';
 import { IOtpRepository } from '@core/repositories/otp.repository.interface';
-import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
-import { ConfigService } from '@nestjs/config';
-import { Otp as PrismaOtp } from '@prisma/client';
-import { BaseRepository } from './base.repository';
 import { UserId } from '@core/value-objects/user-id.vo';
+import { Otp as PrismaOtp } from '@generated/prisma/client';
+import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class OtpRepository extends BaseRepository<Otp> implements IOtpRepository {
