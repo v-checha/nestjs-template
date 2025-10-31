@@ -95,6 +95,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup test database
+        run: |
+          npm run db:generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/nestjs_template_test
+
       - name: Build application
         run: npm run build
 
