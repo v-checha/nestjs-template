@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IThrottlerService } from '@core/services/throttler.service';
 import { ThrottleLimit } from '@core/value-objects/throttle-limit.vo';
-import {
-  InvalidThrottleIdentifierException,
-  ThrottlingException,
-} from '@core/exceptions/domain-exceptions';
+import { InvalidThrottleIdentifierException, ThrottlingException } from '@core/exceptions/domain-exceptions';
 
 @Injectable()
 export class ThrottlerService implements IThrottlerService {
@@ -13,10 +10,7 @@ export class ThrottlerService implements IThrottlerService {
 
   constructor(private readonly configService: ConfigService) {}
 
-  async isAllowed(
-    identifier: string,
-    throttleLimit: ThrottleLimit = this.getDefaultThrottleLimit(),
-  ): Promise<boolean> {
+  async isAllowed(identifier: string, throttleLimit: ThrottleLimit = this.getDefaultThrottleLimit()): Promise<boolean> {
     if (!identifier) {
       throw new InvalidThrottleIdentifierException();
     }
@@ -38,10 +32,7 @@ export class ThrottlerService implements IThrottlerService {
     return record.count < throttleLimit.getLimit;
   }
 
-  async trackRequest(
-    identifier: string,
-    throttleLimit: ThrottleLimit = this.getDefaultThrottleLimit(),
-  ): Promise<void> {
+  async trackRequest(identifier: string, throttleLimit: ThrottleLimit = this.getDefaultThrottleLimit()): Promise<void> {
     if (!identifier) {
       throw new InvalidThrottleIdentifierException();
     }

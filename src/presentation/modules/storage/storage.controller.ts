@@ -16,15 +16,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import {
-  ApiTags,
-  ApiConsumes,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiBearerAuth,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiParam, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 
 import { PermissionsGuard } from '@presentation/guards/permissions.guard';
 import { RequiresResourceAction } from '@shared/decorators/resource-action.decorator';
@@ -136,8 +128,6 @@ export class StorageController {
     @Body() updateFileAccessDto: UpdateFileAccessRequest,
     @CurrentUser() user: IJwtPayload,
   ): Promise<FileResponse> {
-    return this.commandBus.execute(
-      new UpdateFileAccessCommand(id, updateFileAccessDto.isPublic, user.sub),
-    );
+    return this.commandBus.execute(new UpdateFileAccessCommand(id, updateFileAccessDto.isPublic, user.sub));
   }
 }

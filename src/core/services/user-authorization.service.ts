@@ -9,10 +9,7 @@ import {
   CanAssignRoleSpecification,
   CompleteUserAccountSpecification,
 } from '@core/specifications/user.specifications';
-import {
-  AdminRoleSpecification,
-  CanDeleteRoleSpecification,
-} from '@core/specifications/role.specifications';
+import { AdminRoleSpecification, CanDeleteRoleSpecification } from '@core/specifications/role.specifications';
 
 /**
  * Domain service for user authorization and access control business logic

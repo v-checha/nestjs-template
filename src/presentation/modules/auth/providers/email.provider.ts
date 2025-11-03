@@ -111,10 +111,7 @@ export class EmailProvider implements OnModuleInit {
    * @param resetToken The password reset token
    * @returns Promise with the result of the operation
    */
-  async sendPasswordResetEmail(
-    email: string,
-    resetToken: string,
-  ): Promise<nodemailer.SentMessageInfo> {
+  async sendPasswordResetEmail(email: string, resetToken: string): Promise<nodemailer.SentMessageInfo> {
     const transporter = await this.getTransporter();
     const appName = this.configService.get('APP_NAME', 'Our Application');
     const frontendUrl = this.configService.get('FRONTEND_URL', 'https://example.com');

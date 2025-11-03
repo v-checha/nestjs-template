@@ -1,11 +1,6 @@
 import { User } from '@core/entities/user.entity';
 import { Role } from '@core/entities/role.entity';
-import {
-  UserBaseResponse,
-  UserDetailResponse,
-  UserAuthResponse,
-  UserRoleDetailResponse,
-} from '@application/dtos';
+import { UserBaseResponse, UserDetailResponse, UserAuthResponse, UserRoleDetailResponse } from '@application/dtos';
 
 export class UserMapper {
   /**
@@ -42,7 +37,7 @@ export class UserMapper {
       isActive: user.isActive,
       otpEnabled: user.otpEnabled,
       lastLoginAt: user.lastLoginAt,
-      roles: user.roles?.map(role => this.toRoleResponse(role)) || [],
+      roles: user.roles?.map((role) => this.toRoleResponse(role)) || [],
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -54,7 +49,7 @@ export class UserMapper {
   static toAuthResponse(user: User, emailVerified: boolean = false): UserAuthResponse {
     return {
       ...this.toBaseResponse(user, emailVerified),
-      roles: user.roles?.map(role => this.toRoleResponse(role)) || [],
+      roles: user.roles?.map((role) => this.toRoleResponse(role)) || [],
     };
   }
 }

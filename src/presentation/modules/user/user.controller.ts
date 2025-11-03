@@ -40,17 +40,9 @@ export class UserController {
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Profile updated successfully' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data' })
-  async updateCurrentUserProfile(
-    @CurrentUser() user: IJwtPayload,
-    @Body() updateUserDto: UpdateUserRequest,
-  ) {
+  async updateCurrentUserProfile(@CurrentUser() user: IJwtPayload, @Body() updateUserDto: UpdateUserRequest) {
     return this.commandBus.execute(
-      new UpdateUserCommand(
-        user.sub,
-        updateUserDto.firstName,
-        updateUserDto.lastName,
-        updateUserDto.email,
-      ),
+      new UpdateUserCommand(user.sub, updateUserDto.firstName, updateUserDto.lastName, updateUserDto.email),
     );
   }
 
@@ -60,16 +52,9 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Password changed successfully' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Current password is incorrect' })
-  async changeCurrentUserPassword(
-    @CurrentUser() user: IJwtPayload,
-    @Body() changePasswordDto: ChangePasswordRequest,
-  ) {
+  async changeCurrentUserPassword(@CurrentUser() user: IJwtPayload, @Body() changePasswordDto: ChangePasswordRequest) {
     await this.commandBus.execute(
-      new ChangePasswordCommand(
-        user.sub,
-        changePasswordDto.newPassword,
-        changePasswordDto.currentPassword,
-      ),
+      new ChangePasswordCommand(user.sub, changePasswordDto.newPassword, changePasswordDto.currentPassword),
     );
 
     return { message: 'Password changed successfully' };
@@ -80,10 +65,7 @@ export class UserController {
   @ApiOperation({ summary: 'Verify current user password' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Password verification result' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data' })
-  async verifyCurrentUserPassword(
-    @CurrentUser() user: IJwtPayload,
-    @Body('password') password: string,
-  ) {
+  async verifyCurrentUserPassword(@CurrentUser() user: IJwtPayload, @Body('password') password: string) {
     const isValid = await this.commandBus.execute(new VerifyPasswordCommand(user.sub, password));
 
     return { valid: isValid };

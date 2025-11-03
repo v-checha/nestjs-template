@@ -43,7 +43,7 @@ describe('RegisterUserCommandHandler', () => {
     userService = module.get<UserService>(UserService);
 
     // Mock UserMapper
-    jest.spyOn(UserMapper, 'toBaseResponse').mockImplementation(user => {
+    jest.spyOn(UserMapper, 'toBaseResponse').mockImplementation((user) => {
       return {
         id: user.id.getValue(),
         email: user.email.getValue(),
@@ -86,12 +86,7 @@ describe('RegisterUserCommandHandler', () => {
       lastName: createdUser.lastName.getValue(),
     });
 
-    expect(userService.createUser).toHaveBeenCalledWith(
-      'new@example.com',
-      'Password123!',
-      'New',
-      'User',
-    );
+    expect(userService.createUser).toHaveBeenCalledWith('new@example.com', 'Password123!', 'New', 'User');
 
     expect(UserMapper.toBaseResponse).toHaveBeenCalledWith(createdUser);
   });
@@ -111,11 +106,6 @@ describe('RegisterUserCommandHandler', () => {
     // Act & Assert
     await expect(handler.execute(command)).rejects.toThrow(error);
 
-    expect(userService.createUser).toHaveBeenCalledWith(
-      'existing@example.com',
-      'Password123!',
-      'Existing',
-      'User',
-    );
+    expect(userService.createUser).toHaveBeenCalledWith('existing@example.com', 'Password123!', 'Existing', 'User');
   });
 });

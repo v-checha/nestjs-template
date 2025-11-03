@@ -43,9 +43,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter(exceptionLogger));
 
   // Enable CORS with security settings
-  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')?.split(',') || [
-    'http://localhost:3000',
-  ];
+  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')?.split(',') || ['http://localhost:3000'];
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,
@@ -101,10 +99,7 @@ async function bootstrap() {
       basicAuth({
         challenge: true,
         users: {
-          [configService.get<string>('SWAGGER_USER', 'admin')]: configService.get<string>(
-            'SWAGGER_PASSWORD',
-            'admin',
-          ),
+          [configService.get<string>('SWAGGER_USER', 'admin')]: configService.get<string>('SWAGGER_PASSWORD', 'admin'),
         },
       }),
     );
@@ -144,7 +139,7 @@ async function bootstrap() {
   });
 }
 
-bootstrap().catch(err => {
+bootstrap().catch((err) => {
   console.error('Error starting application:', err);
   process.exit(1);
 });

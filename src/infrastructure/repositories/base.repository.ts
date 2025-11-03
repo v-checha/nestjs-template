@@ -24,11 +24,7 @@ export abstract class BaseRepository<T> {
    * @param returnValue - Optional fallback value to return
    * @returns The fallback value
    */
-  protected handleError<R>(
-    operation: string,
-    error: unknown,
-    returnValue: R | null = null,
-  ): R | null {
+  protected handleError<R>(operation: string, error: unknown, returnValue: R | null = null): R | null {
     if (error instanceof Error) {
       this.logger.error(
         {

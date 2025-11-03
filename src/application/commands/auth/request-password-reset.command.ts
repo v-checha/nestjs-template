@@ -13,9 +13,7 @@ export class RequestPasswordResetCommand extends Command<{ message: string }> {
 
 @Injectable()
 @CommandHandler(RequestPasswordResetCommand)
-export class RequestPasswordResetCommandHandler
-  implements ICommandHandler<RequestPasswordResetCommand>
-{
+export class RequestPasswordResetCommandHandler implements ICommandHandler<RequestPasswordResetCommand> {
   constructor(
     private readonly authService: AuthService,
     private readonly emailProvider: EmailProvider,
@@ -36,8 +34,7 @@ export class RequestPasswordResetCommandHandler
       if (error instanceof EntityNotFoundException) {
         // For security reasons, we don't want to reveal whether an email exists in our system
         return {
-          message:
-            'If your email exists in our system, you will receive a password reset link shortly',
+          message: 'If your email exists in our system, you will receive a password reset link shortly',
         };
       }
       throw error;

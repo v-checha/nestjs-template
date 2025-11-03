@@ -49,12 +49,7 @@ export class User {
   }
 
   // Factory method for creating new users
-  static create(
-    email: Email,
-    passwordHash: string,
-    firstName: FirstName,
-    lastName: LastName,
-  ): User {
+  static create(email: Email, passwordHash: string, firstName: FirstName, lastName: LastName): User {
     const userId = UserId.create();
     const user = new User(userId, email, passwordHash, firstName, lastName);
 
@@ -227,12 +222,12 @@ export class User {
       throw new UserCannotRemoveLastRoleException();
     }
 
-    const roleToRemove = this._roles.find(r => r.id.equals(roleId));
+    const roleToRemove = this._roles.find((r) => r.id.equals(roleId));
     if (!roleToRemove) {
       return; // Role not found, no change needed
     }
 
-    this._roles = this._roles.filter(r => !r.id.equals(roleId));
+    this._roles = this._roles.filter((r) => !r.id.equals(roleId));
     this._updatedAt = new Date();
   }
 
@@ -293,7 +288,7 @@ export class User {
 
   // Query methods
   hasRole(roleId: RoleId): boolean {
-    return this._roles.some(r => r.id.equals(roleId));
+    return this._roles.some((r) => r.id.equals(roleId));
   }
 
   hasPermission(permissionName: string): boolean {

@@ -18,6 +18,6 @@ export class GetRolesQueryHandler implements IQueryHandler<GetRolesQuery> {
     const roles = await this.roleRepository.findAll();
 
     // Use the mapper to convert each role to response DTO
-    return roles.map(role => RoleMapper.toDetailResponse(role));
+    return roles.map((role) => RoleMapper.toDetailResponse(role));
   }
 }

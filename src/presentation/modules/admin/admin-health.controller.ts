@@ -13,12 +13,7 @@ import { GetReadinessQuery } from '@application/queries/health/get-readiness.que
 import { GetLivenessQuery } from '@application/queries/health/get-liveness.query';
 
 // Response interfaces
-import {
-  HealthCheckResponse,
-  DatabaseHealthResponse,
-  ReadinessResponse,
-  LivenessResponse,
-} from '@application/dtos';
+import { HealthCheckResponse, DatabaseHealthResponse, ReadinessResponse, LivenessResponse } from '@application/dtos';
 
 @ApiTags('admin-health')
 @Controller('admin/health')

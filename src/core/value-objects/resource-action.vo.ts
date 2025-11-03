@@ -19,8 +19,7 @@ export class ResourceAction {
   private readonly action: ActionType;
 
   constructor(resource: ResourceType | string, action: ActionType | string) {
-    const resourceValue =
-      typeof resource === 'string' ? this.parseResourceType(resource) : resource;
+    const resourceValue = typeof resource === 'string' ? this.parseResourceType(resource) : resource;
 
     if (!this.isValidResource(resourceValue)) {
       throw new InvalidValueObjectException('Invalid resource name');

@@ -18,13 +18,7 @@ export class Role {
   private readonly _createdAt: Date;
   private _updatedAt: Date;
 
-  private constructor(
-    id: RoleId,
-    name: string,
-    description: string,
-    isDefault: boolean = false,
-    createdAt?: Date,
-  ) {
+  private constructor(id: RoleId, name: string, description: string, isDefault: boolean = false, createdAt?: Date) {
     this.validateName(name);
     this.validateDescription(description);
 
@@ -52,13 +46,7 @@ export class Role {
     createdAt: Date;
     updatedAt: Date;
   }): Role {
-    const role = new Role(
-      RoleId.fromString(data.id),
-      data.name,
-      data.description,
-      data.isDefault,
-      data.createdAt,
-    );
+    const role = new Role(RoleId.fromString(data.id), data.name, data.description, data.isDefault, data.createdAt);
 
     role._permissions = data.permissions;
     role._updatedAt = data.updatedAt;
@@ -119,12 +107,12 @@ export class Role {
   }
 
   removePermission(permissionId: PermissionId): void {
-    const permissionExists = this._permissions.some(p => p.id.equals(permissionId));
+    const permissionExists = this._permissions.some((p) => p.id.equals(permissionId));
     if (!permissionExists) {
       return; // Permission not found, no change needed
     }
 
-    this._permissions = this._permissions.filter(p => !p.id.equals(permissionId));
+    this._permissions = this._permissions.filter((p) => !p.id.equals(permissionId));
     this._updatedAt = new Date();
   }
 
@@ -168,7 +156,7 @@ export class Role {
 
   // Query methods
   hasPermission(permissionId: PermissionId): boolean {
-    return this._permissions.some(p => p.id.equals(permissionId));
+    return this._permissions.some((p) => p.id.equals(permissionId));
   }
 
   hasPermissionByName(permissionName: string): boolean {
@@ -196,7 +184,7 @@ export class Role {
   }
 
   getPermissionNames(): string[] {
-    return this._permissions.map(p => p.getPermissionName());
+    return this._permissions.map((p) => p.getPermissionName());
   }
 
   // Private validation methods

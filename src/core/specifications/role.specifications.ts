@@ -110,10 +110,7 @@ export class HasMinimumPermissionsSpecification extends Specification<Role> {
 export class BasicUserRoleSpecification extends Specification<Role> {
   isSatisfiedBy(role: Role): boolean {
     return (
-      !role.isAdminRole() &&
-      !role.isDefault &&
-      role.permissions.length > 0 &&
-      role.permissions.length <= 10 // Basic roles shouldn't have too many permissions
+      !role.isAdminRole() && !role.isDefault && role.permissions.length > 0 && role.permissions.length <= 10 // Basic roles shouldn't have too many permissions
     );
   }
 }

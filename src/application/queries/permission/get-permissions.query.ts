@@ -17,6 +17,6 @@ export class GetPermissionsQueryHandler implements IQueryHandler<GetPermissionsQ
   async execute() {
     const permissions = await this.permissionRepository.findAll();
 
-    return permissions.map(permission => PermissionResponse.fromEntity(permission));
+    return permissions.map((permission) => PermissionResponse.fromEntity(permission));
   }
 }

@@ -3,10 +3,7 @@ import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
 
 // Mocks
-import {
-  createMockUserRepository,
-  createMockRoleRepository,
-} from '../../test/mocks/repositories.factory';
+import { createMockUserRepository, createMockRoleRepository } from '../../test/mocks/repositories.factory';
 import { UserAuthorizationService } from './user-authorization.service';
 
 // Tokens
@@ -307,9 +304,7 @@ describe('UserService', () => {
       userRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.updateUserDetails(userId, newFirstName)).rejects.toThrow(
-        EntityNotFoundException,
-      );
+      await expect(service.updateUserDetails(userId, newFirstName)).rejects.toThrow(EntityNotFoundException);
       expect(userRepository.findById).toHaveBeenCalledWith(userId);
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -406,9 +401,7 @@ describe('UserService', () => {
       userRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.changePassword(userId, newPassword)).rejects.toThrow(
-        EntityNotFoundException,
-      );
+      await expect(service.changePassword(userId, newPassword)).rejects.toThrow(EntityNotFoundException);
       expect(userRepository.findById).toHaveBeenCalledWith(userId);
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -441,9 +434,7 @@ describe('UserService', () => {
       userRepository.findById.mockResolvedValue(user);
 
       // Act & Assert
-      await expect(service.changePassword(userId, newPassword)).rejects.toThrow(
-        InvalidValueObjectException,
-      );
+      await expect(service.changePassword(userId, newPassword)).rejects.toThrow(InvalidValueObjectException);
       expect(userRepository.findById).toHaveBeenCalledWith(userId);
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -461,7 +452,7 @@ describe('UserService', () => {
 
       userRepository.findById.mockResolvedValue(user);
       roleRepository.findById.mockResolvedValue(role);
-      userRepository.update.mockImplementationOnce(user => {
+      userRepository.update.mockImplementationOnce((user) => {
         return Promise.resolve({
           ...user,
           roles: [{ id: roleId, name: 'user' }],

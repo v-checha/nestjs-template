@@ -138,8 +138,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Verify email with verification code',
-    description:
-      'Verify email with the code received. If successful, returns auth tokens like the login endpoint.',
+    description: 'Verify email with the code received. If successful, returns auth tokens like the login endpoint.',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -163,9 +162,7 @@ export class AuthController {
     description: 'Returns the verification status of the email',
   })
   async checkEmailVerificationStatus(@Param('email') email: string) {
-    const isVerified = await this.commandBus.execute(
-      new CheckEmailVerificationStatusCommand(email),
-    );
+    const isVerified = await this.commandBus.execute(new CheckEmailVerificationStatusCommand(email));
 
     return { verified: isVerified };
   }

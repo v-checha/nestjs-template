@@ -74,9 +74,7 @@ describe('RoleController (e2e)', () => {
 
   describe('GET /roles/:id', () => {
     it('should deny access when not authenticated', () => {
-      return request(app.getHttpServer())
-        .get('/api/roles/550e8400-e29b-41d4-a716-446655440000')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/roles/550e8400-e29b-41d4-a716-446655440000').expect(401);
     });
 
     it.skip('should get role by ID when authenticated with permissions', () => {
@@ -158,26 +156,20 @@ describe('RoleController (e2e)', () => {
 
   describe('DELETE /roles/:id', () => {
     it('should deny access when not authenticated', () => {
-      return request(app.getHttpServer())
-        .delete('/api/roles/550e8400-e29b-41d4-a716-446655440000')
-        .expect(401);
+      return request(app.getHttpServer()).delete('/api/roles/550e8400-e29b-41d4-a716-446655440000').expect(401);
     });
   });
 
   describe('Role permissions endpoints', () => {
     it('should deny access when not authenticated for assigning permissions', () => {
       return request(app.getHttpServer())
-        .post(
-          '/api/roles/550e8400-e29b-41d4-a716-446655440000/permissions/550e8400-e29b-41d4-a716-446655440001',
-        )
+        .post('/api/roles/550e8400-e29b-41d4-a716-446655440000/permissions/550e8400-e29b-41d4-a716-446655440001')
         .expect(401);
     });
 
     it('should deny access when not authenticated for removing permissions', () => {
       return request(app.getHttpServer())
-        .delete(
-          '/api/roles/550e8400-e29b-41d4-a716-446655440000/permissions/550e8400-e29b-41d4-a716-446655440001',
-        )
+        .delete('/api/roles/550e8400-e29b-41d4-a716-446655440000/permissions/550e8400-e29b-41d4-a716-446655440001')
         .expect(401);
     });
   });

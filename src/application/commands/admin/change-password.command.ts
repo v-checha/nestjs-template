@@ -14,9 +14,7 @@ export class AdminChangePasswordCommand extends Command<void> {
 
 @Injectable()
 @CommandHandler(AdminChangePasswordCommand)
-export class AdminChangePasswordCommandHandler
-  implements ICommandHandler<AdminChangePasswordCommand>
-{
+export class AdminChangePasswordCommandHandler implements ICommandHandler<AdminChangePasswordCommand> {
   constructor(
     private readonly userService: UserService,
     @Inject(LoggerService) private readonly logger: LoggerService,

@@ -38,7 +38,7 @@ export class PermissionsCollection {
    * Remove a permission from the collection
    */
   remove(permissionId: PermissionId): PermissionsCollection {
-    const filteredPermissions = this._permissions.filter(p => !p.id.equals(permissionId));
+    const filteredPermissions = this._permissions.filter((p) => !p.id.equals(permissionId));
 
     if (filteredPermissions.length === this._permissions.length) {
       // Permission not found, return same collection
@@ -52,37 +52,35 @@ export class PermissionsCollection {
    * Check if collection contains a specific permission
    */
   contains(permissionId: PermissionId): boolean {
-    return this._permissions.some(p => p.id.equals(permissionId));
+    return this._permissions.some((p) => p.id.equals(permissionId));
   }
 
   /**
    * Check if collection contains a permission by name
    */
   containsByName(permissionName: string): boolean {
-    return this._permissions.some(p => p.getPermissionName() === permissionName);
+    return this._permissions.some((p) => p.getPermissionName() === permissionName);
   }
 
   /**
    * Get permission by ID
    */
   getById(permissionId: PermissionId): Permission | undefined {
-    return this._permissions.find(p => p.id.equals(permissionId));
+    return this._permissions.find((p) => p.id.equals(permissionId));
   }
 
   /**
    * Get permission by name
    */
   getByName(permissionName: string): Permission | undefined {
-    return this._permissions.find(p => p.getPermissionName() === permissionName);
+    return this._permissions.find((p) => p.getPermissionName() === permissionName);
   }
 
   /**
    * Filter permissions by resource
    */
   filterByResource(resource: string): PermissionsCollection {
-    const filtered = this._permissions.filter(
-      p => p.getResource().toLowerCase() === resource.toLowerCase(),
-    );
+    const filtered = this._permissions.filter((p) => p.getResource().toLowerCase() === resource.toLowerCase());
 
     return new PermissionsCollection(filtered);
   }
@@ -91,9 +89,7 @@ export class PermissionsCollection {
    * Filter permissions by action
    */
   filterByAction(action: string): PermissionsCollection {
-    const filtered = this._permissions.filter(
-      p => p.getAction().toLowerCase() === action.toLowerCase(),
-    );
+    const filtered = this._permissions.filter((p) => p.getAction().toLowerCase() === action.toLowerCase());
 
     return new PermissionsCollection(filtered);
   }
@@ -102,7 +98,7 @@ export class PermissionsCollection {
    * Get all resource names
    */
   getResources(): string[] {
-    const resources = new Set(this._permissions.map(p => p.getResource()));
+    const resources = new Set(this._permissions.map((p) => p.getResource()));
 
     return Array.from(resources);
   }
@@ -111,7 +107,7 @@ export class PermissionsCollection {
    * Get all action names
    */
   getActions(): string[] {
-    const actions = new Set(this._permissions.map(p => p.getAction()));
+    const actions = new Set(this._permissions.map((p) => p.getAction()));
 
     return Array.from(actions);
   }
@@ -120,7 +116,7 @@ export class PermissionsCollection {
    * Get all permission names
    */
   getPermissionNames(): string[] {
-    return this._permissions.map(p => p.getPermissionName());
+    return this._permissions.map((p) => p.getPermissionName());
   }
 
   /**
@@ -130,7 +126,7 @@ export class PermissionsCollection {
     const adminResources = ['user', 'role', 'permission', 'system'];
     const criticalActions = ['create', 'update', 'delete'];
 
-    return this._permissions.some(p => {
+    return this._permissions.some((p) => {
       const resource = p.getResource().toLowerCase();
       const action = p.getAction().toLowerCase();
 
@@ -142,7 +138,7 @@ export class PermissionsCollection {
    * Check if collection allows access to a specific resource and action
    */
   allowsAccess(resource: string, action: string): boolean {
-    return this._permissions.some(p => p.allowsAction(resource, action));
+    return this._permissions.some((p) => p.allowsAction(resource, action));
   }
 
   /**
@@ -201,7 +197,7 @@ export class PermissionsCollection {
    * Get intersection with another permissions collection
    */
   intersect(other: PermissionsCollection): PermissionsCollection {
-    const intersection = this._permissions.filter(p => other.contains(p.id));
+    const intersection = this._permissions.filter((p) => other.contains(p.id));
 
     return new PermissionsCollection(intersection);
   }
@@ -214,7 +210,7 @@ export class PermissionsCollection {
       return false;
     }
 
-    return this._permissions.every(p => other.contains(p.id));
+    return this._permissions.every((p) => other.contains(p.id));
   }
 
   private validatePermissions(permissions: Permission[]): void {

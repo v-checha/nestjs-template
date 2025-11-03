@@ -86,7 +86,7 @@ export class HealthService {
       checkResults.database = checks[0].status === 'fulfilled';
       checkResults.config = checks[1].status === 'fulfilled';
 
-      const failedChecks = checks.filter(check => check.status === 'rejected');
+      const failedChecks = checks.filter((check) => check.status === 'rejected');
 
       if (failedChecks.length > 0) {
         const failures = failedChecks.map((check, _index) =>
@@ -176,7 +176,7 @@ export class HealthService {
     checks.push(memoryCheck);
 
     // Determine overall status
-    const errorCount = checks.filter(check => check.status === 'error').length;
+    const errorCount = checks.filter((check) => check.status === 'error').length;
     if (errorCount > 0) {
       overallStatus = errorCount >= checks.length / 2 ? 'down' : 'degraded';
     }
@@ -212,12 +212,10 @@ export class HealthService {
 
   private async checkConfiguration(): Promise<void> {
     const requiredVars = ['JWT_SECRET', 'DATABASE_URL'];
-    const missing = requiredVars.filter(key => !this.configService.get(key));
+    const missing = requiredVars.filter((key) => !this.configService.get(key));
 
     if (missing.length > 0) {
-      throw new ConfigurationException(
-        `Missing required environment variables: ${missing.join(', ')}`,
-      );
+      throw new ConfigurationException(`Missing required environment variables: ${missing.join(', ')}`);
     }
   }
 
@@ -239,10 +237,7 @@ export class HealthService {
     }
   }
 
-  private async performHealthCheck(
-    name: string,
-    checkFn: () => Promise<void>,
-  ): Promise<HealthCheckDetailResponse> {
+  private async performHealthCheck(name: string, checkFn: () => Promise<void>): Promise<HealthCheckDetailResponse> {
     const startTime = Date.now();
 
     try {
@@ -275,7 +270,7 @@ export class HealthService {
 
     // CPU usage calculation (simplified)
     const startUsage = process.cpuUsage();
-    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms sampling
+    await new Promise((resolve) => setTimeout(resolve, 100)); // 100ms sampling
     const endUsage = process.cpuUsage(startUsage);
 
     // Convert microseconds to milliseconds and calculate percentage
@@ -286,10 +281,6 @@ export class HealthService {
   }
 
   private getApplicationVersion(): string {
-    return (
-      this.configService.get<string>('npm_package_version') ||
-      process.env.npm_package_version ||
-      '1.0.0'
-    );
+    return this.configService.get<string>('npm_package_version') || process.env.npm_package_version || '1.0.0';
   }
 }

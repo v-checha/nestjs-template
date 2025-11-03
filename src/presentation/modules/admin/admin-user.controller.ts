@@ -13,14 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 // Guards & Decorators
 import { PermissionsGuard } from '@presentation/guards/permissions.guard';
@@ -76,11 +69,7 @@ export class AdminUserController {
   })
   @ApiResponse({ status: HttpStatus.OK, description: 'Returns a paginated list of users' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Admin access required' })
-  async getAllUsers(
-    @Query('search') search?: string,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ) {
+  async getAllUsers(@Query('search') search?: string, @Query('page') page?: number, @Query('limit') limit?: number) {
     return this.queryBus.execute(new GetUsersQuery(search, page, limit));
   }
 
@@ -105,12 +94,7 @@ export class AdminUserController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Admin access required' })
   async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserRequest) {
     await this.commandBus.execute(
-      new AdminUpdateUserCommand(
-        id,
-        updateUserDto.firstName,
-        updateUserDto.lastName,
-        updateUserDto.email,
-      ),
+      new AdminUpdateUserCommand(id, updateUserDto.firstName, updateUserDto.lastName, updateUserDto.email),
     );
 
     return { message: 'User updated successfully' };
@@ -136,13 +120,8 @@ export class AdminUserController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Admin access required' })
-  async changeUserPassword(
-    @Param('id') id: string,
-    @Body() changePasswordDto: AdminChangePasswordRequest,
-  ) {
-    await this.commandBus.execute(
-      new AdminChangePasswordCommand(id, changePasswordDto.newPassword),
-    );
+  async changeUserPassword(@Param('id') id: string, @Body() changePasswordDto: AdminChangePasswordRequest) {
+    await this.commandBus.execute(new AdminChangePasswordCommand(id, changePasswordDto.newPassword));
 
     return { message: 'Password changed successfully' };
   }
@@ -172,9 +151,7 @@ export class AdminUserController {
     @Body() assignRoleDto: AssignRoleRequest,
     @CurrentUser() currentUser: IJwtPayload,
   ) {
-    return this.commandBus.execute(
-      new AssignRoleCommand(id, assignRoleDto.roleId, currentUser.sub),
-    );
+    return this.commandBus.execute(new AssignRoleCommand(id, assignRoleDto.roleId, currentUser.sub));
   }
 
   @Delete(':id/roles/:roleId')

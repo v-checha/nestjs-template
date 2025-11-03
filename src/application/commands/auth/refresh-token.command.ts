@@ -51,7 +51,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
     for (const role of user.roles) {
       const roleWithPermissions = await this.roleRepository.findById(role.id.getValue());
       if (roleWithPermissions && roleWithPermissions.permissions) {
-        roleWithPermissions.permissions.forEach(permission => {
+        roleWithPermissions.permissions.forEach((permission) => {
           userPermissions.add(permission.getStringName());
         });
       }
@@ -65,7 +65,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
       sub: user.id.getValue(),
       email: user.email.getValue(),
       emailVerified: isEmailVerified,
-      roles: user.roles.map(role => role.name),
+      roles: user.roles.map((role) => role.name),
       permissions: Array.from(userPermissions),
     };
 

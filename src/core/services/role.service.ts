@@ -86,12 +86,7 @@ export class RoleService {
     return this.roleRepository.create(role);
   }
 
-  async updateRole(
-    id: string,
-    name?: string,
-    description?: string,
-    isDefault?: boolean,
-  ): Promise<Role> {
+  async updateRole(id: string, name?: string, description?: string, isDefault?: boolean): Promise<Role> {
     const role = await this.roleRepository.findById(id);
     if (!role) {
       throw new EntityNotFoundException('Role', id);

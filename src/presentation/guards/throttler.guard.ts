@@ -46,7 +46,7 @@ export class ThrottlerGuard implements CanActivate {
     const ignoreUserAgents = this.configService.get<string[]>('throttler.ignoreUserAgents');
     const userAgent = request.headers['user-agent'] || '';
 
-    if (ignoreUserAgents && ignoreUserAgents.some(agent => userAgent.includes(agent))) {
+    if (ignoreUserAgents && ignoreUserAgents.some((agent) => userAgent.includes(agent))) {
       return true;
     }
 
@@ -63,10 +63,7 @@ export class ThrottlerGuard implements CanActivate {
     const response = context.switchToHttp().getResponse();
     response.header('X-RateLimit-Limit', throttleLimit.getLimit.toString());
     response.header('X-RateLimit-Remaining', remaining.toString());
-    response.header(
-      'X-RateLimit-Reset',
-      Math.ceil(Date.now() / 1000 + throttleLimit.getTtl).toString(),
-    );
+    response.header('X-RateLimit-Reset', Math.ceil(Date.now() / 1000 + throttleLimit.getTtl).toString());
 
     return true;
   }

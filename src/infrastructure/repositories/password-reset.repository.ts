@@ -1,18 +1,15 @@
-import { Injectable } from '@nestjs/common';
 import { PasswordReset } from '@core/entities/password-reset.entity';
 import { IPasswordResetRepository } from '@core/repositories/password-reset.repository.interface';
-import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
-import { BaseRepository } from './base.repository';
 import { Email } from '@core/value-objects/email.vo';
 import { Token } from '@core/value-objects/token.vo';
 import { UserId } from '@core/value-objects/user-id.vo';
-import { PasswordReset as PrismaPasswordReset } from '@prisma/client';
+import { PasswordReset as PrismaPasswordReset } from '@generated/prisma/client';
+import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
-export class PasswordResetRepository
-  extends BaseRepository<PasswordReset>
-  implements IPasswordResetRepository
-{
+export class PasswordResetRepository extends BaseRepository<PasswordReset> implements IPasswordResetRepository {
   constructor(private readonly prisma: PrismaService) {
     super();
   }

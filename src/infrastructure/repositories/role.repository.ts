@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Role } from '@core/entities/role.entity';
 import { Permission } from '@core/entities/permission.entity';
+import { Role } from '@core/entities/role.entity';
 import { IRoleRepository } from '@core/repositories/role.repository.interface';
-import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { ActionType, ResourceAction } from '@core/value-objects/resource-action.vo';
 import {
+  Permission as PrismaPermission,
   Role as PrismaRole,
   RolePermission as PrismaRolePermission,
-  Permission as PrismaPermission,
-} from '@prisma/client';
-import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
+} from '@generated/prisma/client';
+import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from './base.repository';
 
 // Define a type for Role with its related permissions
@@ -73,7 +73,7 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
       },
     });
 
-    return roleRecords.map(record => this.mapToModel(record as RoleWithPermissions));
+    return roleRecords.map((record) => this.mapToModel(record as RoleWithPermissions));
   }
 
   async findDefaultRole(): Promise<Role | null> {
@@ -104,7 +104,7 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
         isDefault: role.isDefault,
         permissions: {
           create:
-            role.permissions?.map(permission => ({
+            role.permissions?.map((permission) => ({
               permission: {
                 connect: { id: permission.id.getValue() },
               },
@@ -140,7 +140,7 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
         isDefault: role.isDefault,
         permissions: {
           create:
-            role.permissions?.map(permission => ({
+            role.permissions?.map((permission) => ({
               permission: {
                 connect: { id: permission.id.getValue() },
               },
@@ -174,14 +174,11 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
   private mapToModel(record: RoleWithPermissions): Role {
     // Map permissions first
     const permissions =
-      record.permissions?.map(permissionRelation => {
+      record.permissions?.map((permissionRelation) => {
         const permissionRecord = permissionRelation.permission;
 
         // Create ResourceAction value object
-        const resourceAction = new ResourceAction(
-          permissionRecord.resource,
-          permissionRecord.action as ActionType,
-        );
+        const resourceAction = new ResourceAction(permissionRecord.resource, permissionRecord.action as ActionType);
 
         return Permission.fromData({
           id: permissionRecord.id,

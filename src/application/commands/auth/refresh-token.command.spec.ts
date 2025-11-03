@@ -66,12 +66,7 @@ const mockLoggerService = {
 
 // Create test data
 const createTestUser = (): User => {
-  const user = User.create(
-    new Email('test@example.com'),
-    'hashedPassword',
-    new FirstName('John'),
-    new LastName('Doe'),
-  );
+  const user = User.create(new Email('test@example.com'), 'hashedPassword', new FirstName('John'), new LastName('Doe'));
 
   // Add role - need to use fromData method to set ID
   const role = Role.fromData({
@@ -181,13 +176,9 @@ describe('RefreshTokenCommandHandler', () => {
       userId: '550e8400-e29b-41d4-a716-446655440010',
     });
 
-    expect(authService.validateRefreshToken).toHaveBeenCalledWith(
-      '550e8400-e29b-41d4-a716-446655440005',
-    );
+    expect(authService.validateRefreshToken).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440005');
     expect(userRepository.findById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
-    expect(authService.revokeRefreshToken).toHaveBeenCalledWith(
-      '550e8400-e29b-41d4-a716-446655440005',
-    );
+    expect(authService.revokeRefreshToken).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440005');
     expect(roleRepository.findById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440001');
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
 
@@ -222,9 +213,7 @@ describe('RefreshTokenCommandHandler', () => {
 
     // Act & Assert
     await expect(handler.execute(command)).rejects.toThrow(UnauthorizedException);
-    expect(authService.validateRefreshToken).toHaveBeenCalledWith(
-      '550e8400-e29b-41d4-a716-446655440006',
-    );
+    expect(authService.validateRefreshToken).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440006');
     expect(userRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -241,9 +230,7 @@ describe('RefreshTokenCommandHandler', () => {
 
     // Act & Assert
     await expect(handler.execute(command)).rejects.toThrow(UnauthorizedException);
-    expect(authService.validateRefreshToken).toHaveBeenCalledWith(
-      '550e8400-e29b-41d4-a716-446655440005',
-    );
+    expect(authService.validateRefreshToken).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440005');
     expect(userRepository.findById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
     expect(authService.revokeRefreshToken).not.toHaveBeenCalled();
   });
@@ -300,7 +287,7 @@ describe('RefreshTokenCommandHandler', () => {
     mockAuthService.isEmailVerified.mockResolvedValue(true);
 
     // Mock repository to return different roles based on role id
-    mockRoleRepository.findById.mockImplementation(roleId => {
+    mockRoleRepository.findById.mockImplementation((roleId) => {
       if (roleId === '550e8400-e29b-41d4-a716-446655440001') {
         return Promise.resolve(userRoleWithPermissions);
       } else if (roleId === '550e8400-e29b-41d4-a716-446655440003') {

@@ -20,7 +20,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, IResponse<T>>
     const acceptLanguage = request.headers['accept-language'];
 
     return next.handle().pipe(
-      map(data => {
+      map((data) => {
         // Handle responses with message field
         let responseData = data;
         let message: string | undefined;

@@ -26,12 +26,7 @@ export class UserService {
     private readonly userAuthorizationService: UserAuthorizationService,
   ) {}
 
-  async createUser(
-    emailStr: string,
-    passwordStr: string,
-    firstName: string,
-    lastName: string,
-  ): Promise<User> {
+  async createUser(emailStr: string, passwordStr: string, firstName: string, lastName: string): Promise<User> {
     // Validate email using value object
     const email = new Email(emailStr);
 
@@ -102,10 +97,7 @@ export class UserService {
     }
 
     // Update profile with new names if provided
-    user.updateProfile(
-      firstName ? new FirstName(firstName) : undefined,
-      lastName ? new LastName(lastName) : undefined,
-    );
+    user.updateProfile(firstName ? new FirstName(firstName) : undefined, lastName ? new LastName(lastName) : undefined);
 
     if (emailStr) {
       // Validate email using value object
@@ -124,7 +116,7 @@ export class UserService {
     // Handle role updates
     if (roleIds !== undefined) {
       // Get current role IDs
-      const currentRoleIds = user.roles.map(role => role.id.getValue());
+      const currentRoleIds = user.roles.map((role) => role.id.getValue());
       const newRoleIds = [...new Set(roleIds)]; // Remove duplicates
 
       // Remove roles that are no longer selected
@@ -169,11 +161,7 @@ export class UserService {
     return this.comparePasswords(currentPassword, user.passwordHash);
   }
 
-  async changePassword(
-    userId: string,
-    newPasswordStr: string,
-    currentPassword?: string,
-  ): Promise<User> {
+  async changePassword(userId: string, newPasswordStr: string, currentPassword?: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new EntityNotFoundException('User', userId);
@@ -181,10 +169,7 @@ export class UserService {
 
     // If current password is provided, verify it
     if (currentPassword) {
-      const isCurrentPasswordValid = await this.comparePasswords(
-        currentPassword,
-        user.passwordHash,
-      );
+      const isCurrentPasswordValid = await this.comparePasswords(currentPassword, user.passwordHash);
 
       if (!isCurrentPasswordValid) {
         throw new AuthenticationException('Current password is incorrect');

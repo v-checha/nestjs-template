@@ -19,8 +19,9 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@core/*": ["src/core/*"],
       "@application/*": ["src/application/*"],
+      "@core/*": ["src/core/*"],
+      "@generated/prisma/*": ["generated/prisma/*"],
       "@infrastructure/*": ["src/infrastructure/*"],
       "@presentation/*": ["src/presentation/*"],
       "@shared/*": ["src/shared/*"]

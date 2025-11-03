@@ -82,9 +82,7 @@ describe('UserController (e2e)', () => {
 
   describe('GET /users/:id', () => {
     it('should require authentication', () => {
-      return request(app.getHttpServer())
-        .get('/api/users/550e8400-e29b-41d4-a716-446655440000')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/users/550e8400-e29b-41d4-a716-446655440000').expect(401);
     });
 
     it('should deny access to regular users', () => {

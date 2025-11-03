@@ -106,7 +106,7 @@ describe('LoggerService', () => {
 
   it('should respect environment-based log levels', () => {
     // Mock that we're in production
-    jest.spyOn(configService, 'get').mockImplementation(key => {
+    jest.spyOn(configService, 'get').mockImplementation((key) => {
       if (key === 'NODE_ENV') return 'production';
 
       return null;

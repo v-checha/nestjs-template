@@ -1,18 +1,15 @@
-import { Injectable } from '@nestjs/common';
 import { RefreshToken } from '@core/entities/refresh-token.entity';
 import { IRefreshTokenRepository } from '@core/repositories/refresh-token.repository.interface';
-import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
-import { ConfigService } from '@nestjs/config';
-import { RefreshToken as PrismaRefreshToken } from '@prisma/client';
-import { BaseRepository } from './base.repository';
-import { UserId } from '@core/value-objects/user-id.vo';
 import { Token } from '@core/value-objects/token.vo';
+import { UserId } from '@core/value-objects/user-id.vo';
+import { RefreshToken as PrismaRefreshToken } from '@generated/prisma/client';
+import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
-export class RefreshTokenRepository
-  extends BaseRepository<RefreshToken>
-  implements IRefreshTokenRepository
-{
+export class RefreshTokenRepository extends BaseRepository<RefreshToken> implements IRefreshTokenRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
@@ -54,7 +51,7 @@ export class RefreshTokenRepository
         where: { userId },
       });
 
-      return tokenRecords.map(record => this.mapToModel(record));
+      return tokenRecords.map((record) => this.mapToModel(record));
     });
   }
 
@@ -123,10 +120,7 @@ export class RefreshTokenRepository
   }
 
   private mapToModel(record: PrismaRefreshToken): RefreshToken {
-    const refreshExpiration = parseInt(
-      this.configService.get('JWT_REFRESH_EXPIRATION', '7').replace('d', ''),
-      10,
-    );
+    const refreshExpiration = parseInt(this.configService.get('JWT_REFRESH_EXPIRATION', '7').replace('d', ''), 10);
 
     // Create value objects from primitive values
     const userIdVO = UserId.fromString(record.userId);

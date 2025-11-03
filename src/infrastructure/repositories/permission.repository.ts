@@ -1,16 +1,13 @@
-import { Injectable } from '@nestjs/common';
 import { Permission } from '@core/entities/permission.entity';
 import { IPermissionRepository } from '@core/repositories/permission.repository.interface';
+import { ActionType, ResourceAction } from '@core/value-objects/resource-action.vo';
+import { Permission as PrismaPermission } from '@generated/prisma/client';
 import { PrismaService } from '@infrastructure/database/prisma/prisma.service';
-import { Permission as PrismaPermission } from '@prisma/client';
-import { ResourceAction, ActionType } from '@core/value-objects/resource-action.vo';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from './base.repository';
 
 @Injectable()
-export class PermissionRepository
-  extends BaseRepository<Permission>
-  implements IPermissionRepository
-{
+export class PermissionRepository extends BaseRepository<Permission> implements IPermissionRepository {
   constructor(private readonly prisma: PrismaService) {
     super();
   }
@@ -47,7 +44,7 @@ export class PermissionRepository
     return this.executeWithErrorHandling('findAll', async () => {
       const permissionRecords = await this.prisma.permission.findMany();
 
-      return permissionRecords.map(record => this.mapToModel(record));
+      return permissionRecords.map((record) => this.mapToModel(record));
     });
   }
 
@@ -57,7 +54,7 @@ export class PermissionRepository
         where: { resource },
       });
 
-      return permissionRecords.map(record => this.mapToModel(record));
+      return permissionRecords.map((record) => this.mapToModel(record));
     });
   }
 

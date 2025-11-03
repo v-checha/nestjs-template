@@ -1,10 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  LoggerService as NestLoggerService,
-  LogLevel,
-  Scope,
-} from '@nestjs/common';
+import { Inject, Injectable, LoggerService as NestLoggerService, LogLevel, Scope } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable({ scope: Scope.TRANSIENT })
@@ -70,11 +64,7 @@ export class LoggerService implements NestLoggerService {
     }
 
     if (level === 'error') {
-      console.error(
-        `${timestamp} ${level.toUpperCase()} ${contextStr}:`,
-        formattedMessage,
-        stack || '',
-      );
+      console.error(`${timestamp} ${level.toUpperCase()} ${contextStr}:`, formattedMessage, stack || '');
     } else if (level === 'warn') {
       console.warn(`${timestamp} ${level.toUpperCase()} ${contextStr}:`, formattedMessage);
     } else {

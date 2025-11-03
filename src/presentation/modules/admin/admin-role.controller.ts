@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 
@@ -101,12 +90,7 @@ export class AdminRoleController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Admin access required' })
   async updateRole(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleRequest) {
     return this.commandBus.execute(
-      new UpdateRoleCommand(
-        id,
-        updateRoleDto.name,
-        updateRoleDto.description,
-        updateRoleDto.isDefault,
-      ),
+      new UpdateRoleCommand(id, updateRoleDto.name, updateRoleDto.description, updateRoleDto.isDefault),
     );
   }
 
@@ -139,10 +123,7 @@ export class AdminRoleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Permission assigned to role successfully' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Role or permission not found' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Admin access required' })
-  async assignPermissionToRole(
-    @Param('roleId') roleId: string,
-    @Param('permissionId') permissionId: string,
-  ) {
+  async assignPermissionToRole(@Param('roleId') roleId: string, @Param('permissionId') permissionId: string) {
     return this.commandBus.execute(new AssignPermissionCommand(roleId, permissionId));
   }
 
@@ -162,10 +143,7 @@ export class AdminRoleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Permission removed from role successfully' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Role or permission not found' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Admin access required' })
-  async removePermissionFromRole(
-    @Param('roleId') roleId: string,
-    @Param('permissionId') permissionId: string,
-  ) {
+  async removePermissionFromRole(@Param('roleId') roleId: string, @Param('permissionId') permissionId: string) {
     return this.commandBus.execute(new RemovePermissionCommand(roleId, permissionId));
   }
 }

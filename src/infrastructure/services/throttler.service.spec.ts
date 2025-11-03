@@ -2,10 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { ThrottlerService } from './throttler.service';
 import { ThrottleLimit } from '@core/value-objects/throttle-limit.vo';
-import {
-  InvalidThrottleIdentifierException,
-  ThrottlingException,
-} from '@core/exceptions/domain-exceptions';
+import { InvalidThrottleIdentifierException, ThrottlingException } from '@core/exceptions/domain-exceptions';
 
 describe('ThrottlerService', () => {
   let service: ThrottlerService;
@@ -74,9 +71,7 @@ describe('ThrottlerService', () => {
       await service.trackRequest('test-id', throttleLimit);
 
       // Third request should throw
-      await expect(service.trackRequest('test-id', throttleLimit)).rejects.toThrow(
-        ThrottlingException,
-      );
+      await expect(service.trackRequest('test-id', throttleLimit)).rejects.toThrow(ThrottlingException);
 
       try {
         await service.trackRequest('test-id', throttleLimit);
@@ -88,12 +83,8 @@ describe('ThrottlerService', () => {
 
   describe('getRemainingRequests', () => {
     it('should throw an exception when identifier is empty', async () => {
-      await expect(service.getRemainingRequests('')).rejects.toThrow(
-        InvalidThrottleIdentifierException,
-      );
-      await expect(service.getRemainingRequests(null)).rejects.toThrow(
-        InvalidThrottleIdentifierException,
-      );
+      await expect(service.getRemainingRequests('')).rejects.toThrow(InvalidThrottleIdentifierException);
+      await expect(service.getRemainingRequests(null)).rejects.toThrow(InvalidThrottleIdentifierException);
     });
 
     it('should return the full limit for first-time requests', async () => {
@@ -117,9 +108,7 @@ describe('ThrottlerService', () => {
   describe('resetThrottling', () => {
     it('should throw an exception when identifier is empty', async () => {
       await expect(service.resetThrottling('')).rejects.toThrow(InvalidThrottleIdentifierException);
-      await expect(service.resetThrottling(null)).rejects.toThrow(
-        InvalidThrottleIdentifierException,
-      );
+      await expect(service.resetThrottling(null)).rejects.toThrow(InvalidThrottleIdentifierException);
     });
 
     it('should reset throttling for an identifier', async () => {

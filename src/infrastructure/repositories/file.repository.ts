@@ -41,7 +41,7 @@ export class FileRepository extends BaseRepository<File> implements IFileReposit
       orderBy: { createdAt: 'desc' },
     });
 
-    return files.map(file => this.mapToEntity(file));
+    return files.map((file) => this.mapToEntity(file));
   }
 
   async findAll(page: number = 1, limit: number = 20): Promise<{ files: File[]; total: number }> {
@@ -57,7 +57,7 @@ export class FileRepository extends BaseRepository<File> implements IFileReposit
     ]);
 
     return {
-      files: files.map(file => this.mapToEntity(file)),
+      files: files.map((file) => this.mapToEntity(file)),
       total,
     };
   }

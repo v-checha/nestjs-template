@@ -25,7 +25,7 @@ export class TwoFactorEnabledSpecification extends Specification<User> {
  */
 export class AdminUserSpecification extends Specification<User> {
   isSatisfiedBy(user: User): boolean {
-    return user.roles.some(role => role.isAdminRole());
+    return user.roles.some((role) => role.isAdminRole());
   }
 }
 

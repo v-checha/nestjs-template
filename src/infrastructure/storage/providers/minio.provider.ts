@@ -31,7 +31,7 @@ export class MinioStorageProvider implements IStorageProvider {
       region: minioConfig.region,
     });
 
-    this.initializeBuckets().catch(err => {
+    this.initializeBuckets().catch((err) => {
       console.error('Error initializing MinIO buckets:', err);
     });
   }

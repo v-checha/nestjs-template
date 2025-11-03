@@ -24,11 +24,7 @@ import { VerifyPasswordCommandHandler } from '@application/commands/user/verify-
 
 const queryHandlers = [GetUserQueryHandler];
 
-const commandHandlers = [
-  UpdateUserCommandHandler,
-  ChangePasswordCommandHandler,
-  VerifyPasswordCommandHandler,
-];
+const commandHandlers = [UpdateUserCommandHandler, ChangePasswordCommandHandler, VerifyPasswordCommandHandler];
 
 @Module({
   imports: [CqrsModule, PrismaModule, CoreModule],

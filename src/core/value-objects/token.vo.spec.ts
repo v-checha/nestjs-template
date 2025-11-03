@@ -21,9 +21,7 @@ describe('Token Value Object', () => {
   it('should throw for invalid token format', () => {
     // Arrange & Act & Assert
     expect(() => new Token('invalid-token')).toThrow(InvalidValueObjectException);
-    expect(() => new Token('550e8400-e29b-41d4-a716-446655440005-invalid')).toThrow(
-      InvalidValueObjectException,
-    );
+    expect(() => new Token('550e8400-e29b-41d4-a716-446655440005-invalid')).toThrow(InvalidValueObjectException);
     expect(() => new Token('')).toThrow(InvalidValueObjectException);
     expect(() => new Token('  ')).toThrow(InvalidValueObjectException);
   });
@@ -53,8 +51,6 @@ describe('Token Value Object', () => {
 
     // Assert
     expect(token).toBeDefined();
-    expect(token.getValue()).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-    );
+    expect(token.getValue()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 });

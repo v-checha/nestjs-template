@@ -33,12 +33,7 @@ export class CreateRoleCommandHandler implements ICommandHandler<CreateRoleComma
 
     // If permission IDs are provided, create role with permissions in one step
     if (permissionIds && permissionIds.length > 0) {
-      role = await this.roleService.createRoleWithPermissions(
-        name,
-        description,
-        permissionIds,
-        isDefault,
-      );
+      role = await this.roleService.createRoleWithPermissions(name, description, permissionIds, isDefault);
     } else {
       // Create the role without permissions
       role = await this.roleService.createRole(name, description, isDefault);

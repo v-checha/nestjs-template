@@ -59,12 +59,7 @@ const mockLoggerService = {
 
 // Create utility functions for test data
 const createTestUser = (): User => {
-  const user = User.create(
-    new Email('test@example.com'),
-    'hashedPassword',
-    new FirstName('John'),
-    new LastName('Doe'),
-  );
+  const user = User.create(new Email('test@example.com'), 'hashedPassword', new FirstName('John'), new LastName('Doe'));
 
   // Add roles
   const role = Role.fromData({
@@ -141,7 +136,7 @@ describe('LoginCommandHandler', () => {
         firstName: user.firstName.getValue(),
         lastName: user.lastName.getValue(),
         emailVerified: emailVerified || false,
-        roles: user.roles.map(role => ({
+        roles: user.roles.map((role) => ({
           id: role.id.getValue(),
           name: role.name,
         })),
@@ -164,10 +159,7 @@ describe('LoginCommandHandler', () => {
 
     // Act & Assert
     await expect(handler.execute(command)).rejects.toThrow(UnauthorizedException);
-    expect(userService.validateCredentials).toHaveBeenCalledWith(
-      'test@example.com',
-      'wrongPassword',
-    );
+    expect(userService.validateCredentials).toHaveBeenCalledWith('test@example.com', 'wrongPassword');
   });
 
   it('should return email verification required response when email is not verified', async () => {
@@ -193,10 +185,7 @@ describe('LoginCommandHandler', () => {
       message: 'Email verification required',
     });
 
-    expect(userService.validateCredentials).toHaveBeenCalledWith(
-      'test@example.com',
-      'Password123!',
-    );
+    expect(userService.validateCredentials).toHaveBeenCalledWith('test@example.com', 'Password123!');
     expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id.getValue());
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
   });
@@ -225,10 +214,7 @@ describe('LoginCommandHandler', () => {
       message: 'OTP verification required',
     });
 
-    expect(userService.validateCredentials).toHaveBeenCalledWith(
-      'test@example.com',
-      'Password123!',
-    );
+    expect(userService.validateCredentials).toHaveBeenCalledWith('test@example.com', 'Password123!');
     expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id.getValue());
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
   });
@@ -266,10 +252,7 @@ describe('LoginCommandHandler', () => {
       }),
     });
 
-    expect(userService.validateCredentials).toHaveBeenCalledWith(
-      'test@example.com',
-      'Password123!',
-    );
+    expect(userService.validateCredentials).toHaveBeenCalledWith('test@example.com', 'Password123!');
     expect(authService.updateLastLogin).toHaveBeenCalledWith(user.id.getValue());
     expect(authService.isEmailVerified).toHaveBeenCalledWith('test@example.com');
     expect(roleRepository.findById).toHaveBeenCalledWith(user.roles[0].id.getValue());
@@ -328,7 +311,7 @@ describe('LoginCommandHandler', () => {
     mockAuthService.isEmailVerified.mockResolvedValue(true);
 
     // Mock repository to return different roles based on role id
-    mockRoleRepository.findById.mockImplementation(roleId => {
+    mockRoleRepository.findById.mockImplementation((roleId) => {
       if (roleId === '550e8400-e29b-41d4-a716-446655440001') {
         return Promise.resolve(userRoleWithPermissions);
       } else if (roleId === '550e8400-e29b-41d4-a716-446655440003') {

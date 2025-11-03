@@ -25,7 +25,7 @@ export class RoleMapper {
       name: role.name,
       description: role.description,
       isDefault: role.isDefault,
-      permissions: role.permissions?.map(permission => this.toPermissionResponse(permission)) || [],
+      permissions: role.permissions?.map((permission) => this.toPermissionResponse(permission)) || [],
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     };

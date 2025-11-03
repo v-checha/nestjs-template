@@ -11,19 +11,11 @@ export class Permission {
   private readonly _createdAt: Date;
   private _updatedAt: Date;
 
-  private constructor(
-    id: PermissionId,
-    resourceAction: ResourceAction,
-    description: string,
-    createdAt?: Date,
-  ) {
+  private constructor(id: PermissionId, resourceAction: ResourceAction, description: string, createdAt?: Date) {
     this.validateDescription(description);
 
     this._id = id;
-    this._name = PermissionName.create(
-      resourceAction.getResource(),
-      resourceAction.getAction().toString(),
-    );
+    this._name = PermissionName.create(resourceAction.getResource(), resourceAction.getAction().toString());
     this._description = description;
     this._resourceAction = resourceAction;
     this._createdAt = createdAt || new Date();

@@ -6,7 +6,7 @@ import { userFixture, adminFixture } from '../fixtures/user.fixtures';
 
 // Mock User Repository
 export const mockUserRepository = {
-  findById: jest.fn().mockImplementation(id => {
+  findById: jest.fn().mockImplementation((id) => {
     if (id === userFixture.id) {
       return Promise.resolve(userFixture);
     } else if (id === adminFixture.id) {
@@ -16,7 +16,7 @@ export const mockUserRepository = {
     return Promise.resolve(null);
   }),
 
-  findByEmail: jest.fn().mockImplementation(email => {
+  findByEmail: jest.fn().mockImplementation((email) => {
     if (email === userFixture.email) {
       return Promise.resolve(userFixture);
     } else if (email === adminFixture.email) {
@@ -26,7 +26,7 @@ export const mockUserRepository = {
     return Promise.resolve(null);
   }),
 
-  create: jest.fn().mockImplementation(userData => {
+  create: jest.fn().mockImplementation((userData) => {
     return Promise.resolve({
       id: '550e8400-e29b-41d4-a716-446655440099',
       ...userData,
@@ -48,7 +48,7 @@ export const mockUserRepository = {
 
 // Mock Role Repository
 export const mockRoleRepository = {
-  findById: jest.fn().mockImplementation(id => {
+  findById: jest.fn().mockImplementation((id) => {
     if (id === '1') {
       return Promise.resolve({
         id: '1',
@@ -74,7 +74,7 @@ export const mockRoleRepository = {
     return Promise.resolve(null);
   }),
 
-  findByName: jest.fn().mockImplementation(name => {
+  findByName: jest.fn().mockImplementation((name) => {
     if (name === 'admin') {
       return Promise.resolve({
         id: '1',
@@ -129,7 +129,7 @@ export const mockRoleRepository = {
     },
   ]),
 
-  create: jest.fn().mockImplementation(roleData => {
+  create: jest.fn().mockImplementation((roleData) => {
     return Promise.resolve({
       id: '3',
       ...roleData,
@@ -170,7 +170,7 @@ export const mockRoleRepository = {
 
 // Mock Refresh Token Repository
 export const mockRefreshTokenRepository = {
-  findByToken: jest.fn().mockImplementation(token => {
+  findByToken: jest.fn().mockImplementation((token) => {
     if (token === '550e8400-e29b-41d4-a716-446655440000') {
       return Promise.resolve({
         id: '1',
@@ -184,7 +184,7 @@ export const mockRefreshTokenRepository = {
     return Promise.resolve(null);
   }),
 
-  create: jest.fn().mockImplementation(tokenData => {
+  create: jest.fn().mockImplementation((tokenData) => {
     return Promise.resolve({
       id: '1',
       ...tokenData,
@@ -199,7 +199,7 @@ export const mockRefreshTokenRepository = {
 
 // Mock Permission Repository
 export const mockPermissionRepository = {
-  findById: jest.fn().mockImplementation(id => {
+  findById: jest.fn().mockImplementation((id) => {
     const permissions = {
       '1': { id: '1', name: 'user:read' },
       '2': { id: '2', name: 'user:write' },
@@ -212,7 +212,7 @@ export const mockPermissionRepository = {
     return Promise.resolve(permissions[id] || null);
   }),
 
-  findByName: jest.fn().mockImplementation(name => {
+  findByName: jest.fn().mockImplementation((name) => {
     const permissionMapping = {
       'user:read': { id: '1', name: 'user:read' },
       'user:write': { id: '2', name: 'user:write' },
@@ -237,7 +237,7 @@ export const mockPermissionRepository = {
 
 // Mock Email Verification Repository
 export const mockEmailVerificationRepository = {
-  findByEmail: jest.fn().mockImplementation(email => {
+  findByEmail: jest.fn().mockImplementation((email) => {
     if (email === 'test@example.com') {
       return Promise.resolve({
         id: '1',
@@ -251,7 +251,7 @@ export const mockEmailVerificationRepository = {
     return Promise.resolve(null);
   }),
 
-  create: jest.fn().mockImplementation(data => {
+  create: jest.fn().mockImplementation((data) => {
     return Promise.resolve({
       id: '1',
       ...data,
@@ -273,7 +273,7 @@ export const mockEmailVerificationRepository = {
 
 // Mock OTP Repository
 export const mockOtpRepository = {
-  findByUserId: jest.fn().mockImplementation(userId => {
+  findByUserId: jest.fn().mockImplementation((userId) => {
     if (userId === userFixture.id) {
       return Promise.resolve({
         id: '1',
@@ -286,7 +286,7 @@ export const mockOtpRepository = {
     return Promise.resolve(null);
   }),
 
-  create: jest.fn().mockImplementation(data => {
+  create: jest.fn().mockImplementation((data) => {
     return Promise.resolve({
       id: '1',
       ...data,
@@ -308,7 +308,7 @@ export const mockOtpRepository = {
 
 // Mock Password Reset Repository
 export const mockPasswordResetRepository = {
-  findByToken: jest.fn().mockImplementation(token => {
+  findByToken: jest.fn().mockImplementation((token) => {
     if (token === 'reset-token-123') {
       return Promise.resolve({
         id: '1',
@@ -322,7 +322,7 @@ export const mockPasswordResetRepository = {
     return Promise.resolve(null);
   }),
 
-  create: jest.fn().mockImplementation(data => {
+  create: jest.fn().mockImplementation((data) => {
     return Promise.resolve({
       id: '1',
       ...data,

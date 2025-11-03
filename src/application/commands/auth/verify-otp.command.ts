@@ -48,7 +48,7 @@ export class VerifyOtpCommandHandler implements ICommandHandler<VerifyOtpCommand
     const payload = {
       sub: user.id.getValue(),
       email: user.email.getValue(),
-      roles: user.roles.map(role => role.name),
+      roles: user.roles.map((role) => role.name),
     };
 
     const accessToken = this.jwtService.sign(payload, {

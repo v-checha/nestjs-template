@@ -21,7 +21,7 @@ export class TokenProvider {
       sub: user.id.getValue(),
       email: user.email.getValue(),
       emailVerified: isEmailVerified,
-      roles: user.roles.map(role => role.name),
+      roles: user.roles.map((role) => role.name),
       permissions: permissions,
     };
   }

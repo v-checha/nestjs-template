@@ -19,7 +19,7 @@ export const createMockUserRepository = () => ({
   ...mockUserRepository,
   findById: jest.fn().mockImplementation(mockUserRepository.findById),
   findByEmail: jest.fn().mockImplementation(mockUserRepository.findByEmail),
-  create: jest.fn().mockImplementation(userData => {
+  create: jest.fn().mockImplementation((userData) => {
     return Promise.resolve({
       id: '550e8400-e29b-41d4-a716-446655440099',
       ...userData,
@@ -40,7 +40,7 @@ export const createMockUserRepository = () => ({
       deactivate: jest.fn(),
     });
   }),
-  update: jest.fn().mockImplementation(user => {
+  update: jest.fn().mockImplementation((user) => {
     return Promise.resolve({
       ...user,
       email: user.email || { getValue: () => 'updated@example.com' },

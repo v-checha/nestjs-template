@@ -61,10 +61,7 @@ export class AuthService {
 
   private get tokenConfig() {
     return {
-      refreshExpiration: parseInt(
-        this.configService.get<string>('JWT_REFRESH_EXPIRATION', '7d').replace('d', ''),
-        10,
-      ),
+      refreshExpiration: parseInt(this.configService.get<string>('JWT_REFRESH_EXPIRATION', '7d').replace('d', ''), 10),
     };
   }
 

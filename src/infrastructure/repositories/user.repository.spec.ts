@@ -29,7 +29,7 @@ const mockPrismaService = {
   userRole: {
     deleteMany: jest.fn(),
   },
-  $transaction: jest.fn(callback => callback(mockPrismaService)),
+  $transaction: jest.fn((callback) => callback(mockPrismaService)),
 };
 
 describe('UserRepository', () => {
@@ -159,10 +159,7 @@ describe('UserRepository', () => {
         new LastName('Doe'),
       );
 
-      const mockUpdatedUser = createMockUserRecord(
-        existingUser.id.getValue(),
-        existingUser.email.getValue(),
-      );
+      const mockUpdatedUser = createMockUserRecord(existingUser.id.getValue(), existingUser.email.getValue());
       mockPrismaService.userRole.deleteMany.mockResolvedValue({ count: 0 });
       mockPrismaService.user.update.mockResolvedValue(mockUpdatedUser);
 

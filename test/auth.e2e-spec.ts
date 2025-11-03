@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { ThrottlerService } from '@infrastructure/services/throttler.service';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { JwtService } from '@nestjs/jwt';
-import { ThrottlerService } from '@infrastructure/services/throttler.service';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -61,7 +61,7 @@ describe('AuthController (e2e)', () => {
         .get('/api/auth/me')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body).toHaveProperty('id');
           expect(res.body).toHaveProperty('email');
           expect(res.body).toHaveProperty('roles');
@@ -69,10 +69,7 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should fail with invalid token', () => {
-      return request(app.getHttpServer())
-        .get('/api/auth/me')
-        .set('Authorization', 'Bearer invalid-token')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/auth/me').set('Authorization', 'Bearer invalid-token').expect(401);
     });
 
     it('should fail without token', () => {
@@ -103,7 +100,7 @@ describe('AuthController (e2e)', () => {
           lastName: 'User',
         })
         .expect(201)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body).toHaveProperty('id');
           expect(res.body).toHaveProperty('email', 'test-user@example.com');
         });
@@ -129,7 +126,7 @@ describe('AuthController (e2e)', () => {
           password: 'Password123!',
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body).toHaveProperty('accessToken');
           expect(res.body).toHaveProperty('refreshToken');
           expect(res.body).toHaveProperty('user');

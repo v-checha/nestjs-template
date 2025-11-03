@@ -97,7 +97,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     for (const role of user.roles) {
       const roleWithPermissions = await this.roleRepository.findById(role.id.getValue());
       if (roleWithPermissions && roleWithPermissions.permissions) {
-        roleWithPermissions.permissions.forEach(permission => {
+        roleWithPermissions.permissions.forEach((permission) => {
           userPermissions.add(permission.getStringName());
         });
       }
@@ -106,7 +106,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     this.logger.debug({
       message: 'User permissions collected',
       userId: user.id.getValue(),
-      roles: user.roles.map(r => r.name),
+      roles: user.roles.map((r) => r.name),
       permissionsCount: userPermissions.size,
     });
 

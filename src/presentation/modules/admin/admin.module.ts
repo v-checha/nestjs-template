@@ -120,13 +120,7 @@ const commandHandlers = [
       }),
     }),
   ],
-  controllers: [
-    AdminAuthController,
-    AdminController,
-    AdminUserController,
-    AdminRoleController,
-    AdminHealthController,
-  ],
+  controllers: [AdminAuthController, AdminController, AdminUserController, AdminRoleController, AdminHealthController],
   providers: [
     // Services
     {

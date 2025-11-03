@@ -23,14 +23,7 @@ export class UpdateUserCommandHandler implements ICommandHandler<UpdateUserComma
   async execute(command: UpdateUserCommand) {
     const { userId, firstName, lastName, email, roleIds, isActive } = command;
 
-    const user = await this.userService.updateUserDetails(
-      userId,
-      firstName,
-      lastName,
-      email,
-      roleIds,
-      isActive,
-    );
+    const user = await this.userService.updateUserDetails(userId, firstName, lastName, email, roleIds, isActive);
 
     // Use the mapper to convert to response DTO
     return UserMapper.toBaseResponse(user);

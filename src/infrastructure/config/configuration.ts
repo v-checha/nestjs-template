@@ -40,8 +40,6 @@ export default () => ({
   i18n: {
     defaultLocale: process.env.DEFAULT_LOCALE || 'en',
     fallbackLocale: process.env.FALLBACK_LOCALE || 'en',
-    supportedLocales: process.env.SUPPORTED_LOCALES
-      ? process.env.SUPPORTED_LOCALES.split(',')
-      : ['en', 'ar'],
+    supportedLocales: process.env.SUPPORTED_LOCALES ? process.env.SUPPORTED_LOCALES.split(',') : ['en', 'ar'],
   },
 });

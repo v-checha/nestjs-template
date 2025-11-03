@@ -42,7 +42,7 @@ export class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery> {
     });
 
     return {
-      users: users.map(user => UserMapper.toDetailResponse(user)),
+      users: users.map((user) => UserMapper.toDetailResponse(user)),
       total,
       page,
       limit,

@@ -1,9 +1,5 @@
 import { ResetPasswordRequest } from '@application/dtos';
-import {
-  EntityNotFoundException,
-  OtpExpiredException,
-  OtpInvalidException,
-} from '@core/exceptions/domain-exceptions';
+import { EntityNotFoundException, OtpExpiredException, OtpInvalidException } from '@core/exceptions/domain-exceptions';
 import { AuthService } from '@core/services/auth.service';
 import { UserService } from '@core/services/user.service';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';

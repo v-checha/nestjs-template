@@ -17,11 +17,7 @@ import { GetAllFilesQueryHandler } from '@application/queries/storage/get-all-fi
 // Mappers
 import { FileMapper } from '@application/mappers/file.mapper';
 
-const CommandHandlers = [
-  UploadFileCommandHandler,
-  DeleteFileCommandHandler,
-  UpdateFileAccessCommandHandler,
-];
+const CommandHandlers = [UploadFileCommandHandler, DeleteFileCommandHandler, UpdateFileAccessCommandHandler];
 
 const QueryHandlers = [GetFileQueryHandler, GetUserFilesQueryHandler, GetAllFilesQueryHandler];
 

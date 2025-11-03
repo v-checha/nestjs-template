@@ -12,9 +12,7 @@ export class SendVerificationEmailCommand extends Command<{ message: string }> {
 
 @Injectable()
 @CommandHandler(SendVerificationEmailCommand)
-export class SendVerificationEmailCommandHandler
-  implements ICommandHandler<SendVerificationEmailCommand>
-{
+export class SendVerificationEmailCommandHandler implements ICommandHandler<SendVerificationEmailCommand> {
   constructor(
     private readonly authService: AuthService,
     private readonly emailProvider: EmailProvider,

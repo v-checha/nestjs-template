@@ -37,7 +37,7 @@ export class RolesCollection {
    * Remove a role from the collection
    */
   remove(roleId: RoleId): RolesCollection {
-    const filteredRoles = this._roles.filter(r => !r.id.equals(roleId));
+    const filteredRoles = this._roles.filter((r) => !r.id.equals(roleId));
 
     if (filteredRoles.length === this._roles.length) {
       // Role not found, return same collection
@@ -51,42 +51,42 @@ export class RolesCollection {
    * Check if collection contains a specific role
    */
   contains(roleId: RoleId): boolean {
-    return this._roles.some(r => r.id.equals(roleId));
+    return this._roles.some((r) => r.id.equals(roleId));
   }
 
   /**
    * Check if collection contains a role by name
    */
   containsByName(roleName: string): boolean {
-    return this._roles.some(r => r.name.toLowerCase() === roleName.toLowerCase());
+    return this._roles.some((r) => r.name.toLowerCase() === roleName.toLowerCase());
   }
 
   /**
    * Get role by ID
    */
   getById(roleId: RoleId): Role | undefined {
-    return this._roles.find(r => r.id.equals(roleId));
+    return this._roles.find((r) => r.id.equals(roleId));
   }
 
   /**
    * Get role by name
    */
   getByName(roleName: string): Role | undefined {
-    return this._roles.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+    return this._roles.find((r) => r.name.toLowerCase() === roleName.toLowerCase());
   }
 
   /**
    * Get the default role
    */
   getDefaultRole(): Role | undefined {
-    return this._roles.find(r => r.isDefault);
+    return this._roles.find((r) => r.isDefault);
   }
 
   /**
    * Get all admin roles
    */
   getAdminRoles(): RolesCollection {
-    const adminRoles = this._roles.filter(r => r.isAdminRole());
+    const adminRoles = this._roles.filter((r) => r.isAdminRole());
 
     return new RolesCollection(adminRoles);
   }
@@ -95,7 +95,7 @@ export class RolesCollection {
    * Get all non-admin roles
    */
   getNonAdminRoles(): RolesCollection {
-    const nonAdminRoles = this._roles.filter(r => !r.isAdminRole());
+    const nonAdminRoles = this._roles.filter((r) => !r.isAdminRole());
 
     return new RolesCollection(nonAdminRoles);
   }
@@ -104,7 +104,7 @@ export class RolesCollection {
    * Get roles that can be deleted
    */
   getDeletableRoles(): RolesCollection {
-    const deletableRoles = this._roles.filter(r => r.canBeDeleted());
+    const deletableRoles = this._roles.filter((r) => r.canBeDeleted());
 
     return new RolesCollection(deletableRoles);
   }
@@ -113,14 +113,14 @@ export class RolesCollection {
    * Get all role names
    */
   getRoleNames(): string[] {
-    return this._roles.map(r => r.name);
+    return this._roles.map((r) => r.name);
   }
 
   /**
    * Get all permissions from all roles (combined)
    */
   getAllPermissions(): PermissionsCollection {
-    const allPermissions = this._roles.flatMap(r => r.permissions);
+    const allPermissions = this._roles.flatMap((r) => r.permissions);
 
     return PermissionsCollection.create(allPermissions);
   }
@@ -129,21 +129,21 @@ export class RolesCollection {
    * Check if collection has admin privileges
    */
   hasAdminPrivileges(): boolean {
-    return this._roles.some(r => r.isAdminRole());
+    return this._roles.some((r) => r.isAdminRole());
   }
 
   /**
    * Check if collection allows access to a specific resource and action
    */
   allowsAccess(resource: string, action: string): boolean {
-    return this._roles.some(r => r.permissions.some(p => p.allowsAction(resource, action)));
+    return this._roles.some((r) => r.permissions.some((p) => p.allowsAction(resource, action)));
   }
 
   /**
    * Check if collection has a specific permission by name
    */
   hasPermission(permissionName: string): boolean {
-    return this._roles.some(r => r.hasPermissionByName(permissionName));
+    return this._roles.some((r) => r.hasPermissionByName(permissionName));
   }
 
   /**
@@ -241,7 +241,7 @@ export class RolesCollection {
    * Get intersection with another roles collection
    */
   intersect(other: RolesCollection): RolesCollection {
-    const intersection = this._roles.filter(r => other.contains(r.id));
+    const intersection = this._roles.filter((r) => other.contains(r.id));
 
     return new RolesCollection(intersection);
   }
@@ -254,7 +254,7 @@ export class RolesCollection {
       return false;
     }
 
-    return this._roles.every(r => other.contains(r.id));
+    return this._roles.every((r) => other.contains(r.id));
   }
 
   /**

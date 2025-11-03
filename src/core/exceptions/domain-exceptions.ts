@@ -126,10 +126,7 @@ export class RoleHasAssignedUsersException extends RoleDomainException {
 
 export class PermissionAlreadyAssignedException extends RoleDomainException {
   constructor(permissionName: string, roleName: string) {
-    super(
-      `Permission ${permissionName} is already assigned to role ${roleName}`,
-      HttpStatus.CONFLICT,
-    );
+    super(`Permission ${permissionName} is already assigned to role ${roleName}`, HttpStatus.CONFLICT);
   }
 }
 
